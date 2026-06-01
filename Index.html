@@ -361,7 +361,7 @@ function getScore(pid,day){const r=getWeekRatings()[pid]?.[day];if(!r)return 0;l
 function getTotalScore(pid){return DAYS.reduce((s,_,i)=>s+getScore(pid,i),0);}
 function renderRatingAll(){
   document.getElementById('weekLabel').textContent=getWeekLabel();
-  document.getElementById('dayPills').innerHTML=DAYS.map((d,i)=>`<button class="day-pill ${i===state.currentDay?'active':''}" onclick="selectDay(${i})">${d}</button>`).join('');
+  document.getElementById('dayPills').innerHTML=DAYS.map((d,i)=>{const wk=new Date(currentWeekKey());const off=[6,0,1,2,3,4,5];const dd=new Date(wk);dd.setDate(wk.getDate()+off[i]);const ds=dd.toLocaleDateString('en-GB',{day:'numeric',month:'numeric'});return`<button class="day-pill ${i===state.currentDay?'active':''}" onclick="selectDay(${i})">${d}<br><span style="font-size:0.65rem;opacity:0.8">${ds}</span></button>`;}).join('');
   renderPlayerCards();renderLeaderboard();renderRPlayersList();
 }
 window.selectDay=function(i){state.currentDay=i;openCard=null;renderPlayerCards();document.querySelectorAll('.day-pill').forEach((b,idx)=>b.className='day-pill'+(idx===i?' active':''));};
