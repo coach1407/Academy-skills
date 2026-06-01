@@ -173,7 +173,13 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="tab" onclick="switchTab('rplayers',this)">👥 اللاعبون</button>
   </div>
   <div class="tab-content active" id="tab-daily">
-    <div class="rating-day-select" id="dayPills"></div>
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+    <button class="day-pill active" onclick="setRatingGroup('all',this)" id="rg-all">الكل</button>
+    <button class="day-pill" onclick="setRatingGroup('big',this)" id="rg-big">🔵 الكبار</button>
+    <button class="day-pill" onclick="setRatingGroup('mid',this)" id="rg-mid">🟡 الوسط</button>
+    <button class="day-pill" onclick="setRatingGroup('small',this)" id="rg-small">🟢 الصغار</button>
+  </div>
+  <div class="rating-day-select" id="dayPills"></div>
     <div id="playerCards"></div>
     <div class="save-row"><button class="btn btn-gold" onclick="saveAll()">☁️ حفظ</button></div>
   </div>
@@ -183,6 +189,12 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <div class="section-title">➕ إضافة لاعب</div>
       <div class="form-grid">
         <div><label>الاسم</label><input id="rNewName" placeholder="اسم اللاعب"/></div>
+        <div class="form-full"><label>المجموعة</label>
+          <select id="rNewGroup">
+            <option value="big">🔵 الكبار</option>
+            <option value="mid">🟡 الوسط</option>
+            <option value="small">🟢 الصغار</option>
+          </select></div>
         <div><label>المركز</label>
           <select id="rNewPos">
             <option value="fwd">⚡ مهاجم</option><option value="rw">↗️ جناح أيمن</option>
@@ -218,6 +230,12 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <button class="btn btn-sm sub-expired" onclick="filterSub('expired')">❌ منتهي</button>
       <button class="btn btn-sm sub-stopped" onclick="filterSub('stopped')">⏸ موقوف</button>
     </div>
+    <div style="display:flex;gap:0.35rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+      <button class="day-pill active" onclick="filterSubGroup('all',this)">الكل</button>
+      <button class="day-pill" onclick="filterSubGroup('big',this)">🔵 الكبار</button>
+      <button class="day-pill" onclick="filterSubGroup('mid',this)">🟡 الوسط</button>
+      <button class="day-pill" onclick="filterSubGroup('small',this)">🟢 الصغار</button>
+    </div>
     <div id="subList"></div>
   </div>
   <div class="sub-page" id="sub-add">
@@ -225,6 +243,12 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <div class="section-title">➕ تسجيل لاعب جديد</div>
       <div class="form-grid">
         <div class="form-full"><label>اسم اللاعب *</label><input id="sName" placeholder="الاسم الكامل"/></div>
+        <div class="form-full"><label>المجموعة</label>
+          <select id="sGroup">
+            <option value="big">🔵 الكبار</option>
+            <option value="mid">🟡 الوسط</option>
+            <option value="small">🟢 الصغار</option>
+          </select></div>
         <div><label>سنة الميلاد</label><input id="sBirth" type="number" placeholder="2010"/></div>
         <div><label>رقم التيشيرت</label><input id="sJersey" type="number" placeholder="10"/></div>
         <div><label>تاريخ الاشتراك</label><input id="sStart" type="date" oninput="autoSetEndDate()"/></div>
@@ -245,9 +269,15 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="sub-tab" onclick="switchAtt('stats',this)">📊 إحصائيات</button>
   </div>
   <div class="sub-page active" id="att-record">
-    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:center;">
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;align-items:center;">
       <input type="date" id="attDate" style="flex:1" oninput="renderAttList()"/>
       <button class="btn btn-sm btn-green" onclick="setAttToday()">اليوم</button>
+    </div>
+    <div style="display:flex;gap:0.35rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+      <button class="day-pill active" onclick="setAttGroup('all',this)">الكل</button>
+      <button class="day-pill" onclick="setAttGroup('big',this)">🔵 الكبار</button>
+      <button class="day-pill" onclick="setAttGroup('mid',this)">🟡 الوسط</button>
+      <button class="day-pill" onclick="setAttGroup('small',this)">🟢 الصغار</button>
     </div>
     <div id="attDaySummary" style="margin-bottom:0.6rem;"></div>
     <div id="attList"></div>
@@ -309,7 +339,7 @@ const POS_LABEL={gk:'حارس',def:'مدافع',rb:'مدافع أيمن',lb:'م�
 const POS_EMOJI={gk:'🧤',def:'🛡️',rb:'🛡️',lb:'🛡️',mid:'🔄',fwd:'⚡',rw:'↗️',lw:'↖️'};
 
 let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},currentDay:0};
-let weekOffset=0,openCard=null,subFilter='all';
+let weekOffset=0,openCard=null,subFilter='all',subGroupFilter='all',ratingGroup='all',attGroup='all';
 
 function setSyncStatus(t,m){const el=document.getElementById('syncStatus');el.className='sync-status sync-'+t;el.innerHTML=m;}
 
@@ -329,6 +359,12 @@ async function saveAll(){
   catch(e){setSyncStatus('err','⚠️ فشل');btn.innerHTML='☁️ حفظ';btn.disabled=false;}
 }
 window.saveAll=saveAll;
+
+window.setRatingGroup=function(g,btn){ratingGroup=g;document.querySelectorAll('[id^="rg-"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderPlayerCards();};
+window.setAttGroup=function(g,btn){attGroup=g;document.querySelectorAll('#att-record .day-pill').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderAttList();};
+window.filterSubGroup=function(g,btn){subGroupFilter=g;document.querySelectorAll('#sub-list .day-pill').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderSubList();};
+
+const GROUP_LABEL={big:'🔵 الكبار',mid:'🟡 الوسط',small:'🟢 الصغار',all:'الكل'};
 
 function renderAll(){renderRatingAll();renderSubList();renderAttList();renderAlerts();renderAttStats();}
 
@@ -369,7 +405,10 @@ function renderPlayerCards(){
   const el=document.getElementById('playerCards');
   if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">أضف لاعبين من تبويب "اللاعبون"</p>';return;}
   const ratings=getWeekRatings();
-  el.innerHTML=state.ratingPlayers.map(p=>{
+  let filteredPlayers=state.ratingPlayers;
+  if(ratingGroup!=='all') filteredPlayers=filteredPlayers.filter(p=>p.group===ratingGroup);
+  if(!filteredPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
+  el.innerHTML=filteredPlayers.map(p=>{
     const ds=getScore(p.id,state.currentDay),r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{}},bonuses=BONUS[p.pos]||[],isOpen=openCard===p.id;
     const cHTML=CRITERIA.map(c=>{const btns=Array.from({length:c.max+1},(_,v)=>`<button class="score-btn ${(r.criteria[c.id]||0)===v?'selected':''}" onclick="setScore('${p.id}','${c.id}',${v});event.stopPropagation()">${v}</button>`).join('');return`<div class="criteria-row"><div class="criteria-label">${c.label}(/${c.max})</div><div class="score-btns">${btns}</div></div>`;}).join('');
     const bHTML=bonuses.length?`<div class="bonus-section"><div class="bonus-label">⭐ ${POS_LABEL[p.pos]}</div>${bonuses.map(b=>`<div class="bonus-row"><div class="bonus-name">${b.label}(+${b.pts})</div><div class="counter-btns"><button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',-1);event.stopPropagation()">−</button><div class="counter-val">${r.bonus?.[b.id]||0}</div><button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',1);event.stopPropagation()">+</button></div></div>`).join('')}</div>`:'';
@@ -386,12 +425,14 @@ function renderLeaderboard(){
   const ws=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)})).sort((a,b)=>b.total-a.total);
   const overall=renderBoard('🏆 أفضل لاعب',ws);
   const byPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{const f=ws.filter(p=>p.pos===pos);return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]}`,f):'';}).join('');
+  const byGroup=['big','mid','small'].map(g=>{const f=ws.filter(p=>p.group===g);return f.length?renderBoard(`${GROUP_LABEL[g]} — الترتيب`,f):'';}).join('');
   const ds=DAYS.map((day,di)=>{const sc=ws.map(p=>({...p,score:getScore(p.id,di)})).sort((a,b)=>b.score-a.score);const t=sc[0];if(!t||t.score===0)return`<div class="board-row"><span style="color:var(--muted)">${day}: —</span></div>`;return`<div class="board-row"><span style="color:var(--gold)">⭐</span><div class="board-name">${day}</div><div style="font-weight:700">${t.name}</div><div class="board-pts">${t.score}</div></div>`;}).join('');
-  el.innerHTML=`${overall}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
+  el.innerHTML=`${overall}${byGroup}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
 }
 function renderBoard(title,players){if(!players.length)return'';const medals=['🥇','🥈','🥉'];const rows=players.slice(0,3).map((p,i)=>`<div class="board-row"><div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}</div><div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div></div>`).join('');return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;}
-window.addRatingPlayer=function(){const name=document.getElementById('rNewName').value.trim(),pos=document.getElementById('rNewPos').value;if(!name)return;state.ratingPlayers.push({id:Date.now().toString(),name,pos});document.getElementById('rNewName').value='';renderRPlayersList();renderPlayerCards();};
-function renderRPlayersList(){const el=document.getElementById('rPlayersList');if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}</div><span style="color:var(--muted);font-size:0.76rem">${POS_LABEL[p.pos]}</span><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">حذف</button></div>`).join('');}
+window.addRatingPlayer=function(){const name=document.getElementById('rNewName').value.trim(),pos=document.getElementById('rNewPos').value,group=document.getElementById('rNewGroup').value;if(!name)return;state.ratingPlayers.push({id:Date.now().toString(),name,pos,group});document.getElementById('rNewName').value='';renderRPlayersList();renderPlayerCards();};
+function renderRPlayersList(){const el=document.getElementById('rPlayersList');if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}const groupColors={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
+  el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}<br><span style="font-size:0.7rem;color:${groupColors[p.group]||'var(--muted)'}">${GROUP_LABEL[p.group||'all']}</span></div><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">حذف</button></div>`).join('');}
 window.removeRPlayer=function(id){showModal('حذف لاعب','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});renderRPlayersList();renderPlayerCards();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.confirmResetWeek=function(){showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[{label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers')renderRPlayersList();};
@@ -421,13 +462,14 @@ window.renderSubList=function(){
   let players=[...state.subPlayers];
   if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
   if(subFilter!=='all')players=players.filter(p=>{const s=getSubStatus(p);return s===subFilter||(subFilter==='active'&&s==='expiring');});
+  if(subGroupFilter!=='all')players=players.filter(p=>p.group===subGroupFilter);
   if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
   el.innerHTML=players.map(p=>{
     const status=getSubStatus(p);
     return`<div class="player-sub-card">
       <div class="player-sub-header" onclick="toggleSubCard('${p.id}')">
         <div class="jersey">${p.jersey||'—'}</div>
-        <div class="player-sub-name">${p.name}<br><span style="font-size:0.7rem;color:var(--muted)">${p.birthYear?'م'+p.birthYear:''}</span></div>
+        <div class="player-sub-name">${p.name}<br><span style="font-size:0.7rem;color:var(--muted)">${p.birthYear?'م'+p.birthYear:''} ${p.group?'• '+GROUP_LABEL[p.group]:''}</span></div>
         <span class="sub-badge ${SUB_CLASS[status]}">${SUB_LABEL[status]}</span>
         <div class="chevron" id="chevron-${p.id}">▼</div>
       </div>
@@ -448,7 +490,7 @@ window.renderSubList=function(){
 window.toggleSubCard=function(id){const body=document.getElementById('subbody-'+id),chev=document.getElementById('chevron-'+id);body.classList.toggle('open');chev.classList.toggle('open');};
 window.addSubPlayer=function(){
   const name=document.getElementById('sName').value.trim();if(!name)return;
-  const p={id:Date.now().toString(),name,birthYear:document.getElementById('sBirth').value,jersey:document.getElementById('sJersey').value,startDate:document.getElementById('sStart').value,endDate:document.getElementById('sEnd').value,stopped:false};
+  const p={id:Date.now().toString(),name,group:document.getElementById('sGroup').value,birthYear:document.getElementById('sBirth').value,jersey:document.getElementById('sJersey').value,startDate:document.getElementById('sStart').value,endDate:document.getElementById('sEnd').value,stopped:false};
   state.subPlayers.push(p);
   ['sName','sBirth','sJersey','sStart','sEnd'].forEach(id=>document.getElementById(id).value='');
   showModal('✅ تم','تم تسجيل اللاعب بنجاح','',[{label:'حسناً',cls:'btn-green',action:closeModal}]);
@@ -514,8 +556,9 @@ window.renderAttList=function(){
   const el=document.getElementById('attList'),sumEl=document.getElementById('attDaySummary');
   const date=document.getElementById('attDate').value;
   if(!date){el.innerHTML='<p class="empty-msg">اختر تاريخاً أولاً</p>';sumEl.innerHTML='';return;}
-  const allPlayers=getAllPlayers();
-  if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
+  let allPlayers=getAllPlayers();
+  if(attGroup!=='all') allPlayers=allPlayers.filter(p=>p.group===attGroup);
+  if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
   if(!state.attendance[date])state.attendance[date]={};
   const present=allPlayers.filter(p=>state.attendance[date][p.id]==='present').length;
   const absent=allPlayers.filter(p=>state.attendance[date][p.id]==='absent').length;
