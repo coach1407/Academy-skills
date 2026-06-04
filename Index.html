@@ -406,7 +406,7 @@ function renderPlayerCards(){
   if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">أضف لاعبين من تبويب "اللاعبون"</p>';return;}
   const ratings=getWeekRatings();
   let filteredPlayers=state.ratingPlayers;
-  if(ratingGroup!=='all') filteredPlayers=filteredPlayers.filter(p=>p.group===ratingGroup);
+  if(ratingGroup!=='all') filteredPlayers=filteredPlayers.filter(p=>(p.group||'')===ratingGroup);
   if(!filteredPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
   el.innerHTML=filteredPlayers.map(p=>{
     const ds=getScore(p.id,state.currentDay),r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{}},bonuses=BONUS[p.pos]||[],isOpen=openCard===p.id;
@@ -432,7 +432,38 @@ function renderLeaderboard(){
 function renderBoard(title,players){if(!players.length)return'';const medals=['🥇','🥈','🥉'];const rows=players.slice(0,3).map((p,i)=>`<div class="board-row"><div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}</div><div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div></div>`).join('');return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;}
 window.addRatingPlayer=function(){const name=document.getElementById('rNewName').value.trim(),pos=document.getElementById('rNewPos').value,group=document.getElementById('rNewGroup').value;if(!name)return;state.ratingPlayers.push({id:Date.now().toString(),name,pos,group});document.getElementById('rNewName').value='';renderRPlayersList();renderPlayerCards();};
 function renderRPlayersList(){const el=document.getElementById('rPlayersList');if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}const groupColors={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
-  el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}<br><span style="font-size:0.7rem;color:${groupColors[p.group]||'var(--muted)'}">${GROUP_LABEL[p.group||'all']}</span></div><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">حذف</button></div>`).join('');}
+  el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}<br><span style="font-size:0.7rem;color:${groupColors[p.group]||'var(--muted)'}">${GROUP_LABEL[p.group||'']||'لم تُحدد'}</span></div><button class="btn btn-blue btn-sm" onclick="editRPlayer('${p.id}')" style="margin-left:0.3rem">✏️</button><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">🗑️</button></div>`).join('');}
+window.editRPlayer=function(id){
+  const p=state.ratingPlayers.find(x=>x.id===id);if(!p)return;
+  showModal('✏️ تعديل بيانات اللاعب','',`
+    <label>الاسم</label><input id="editRName" value="${p.name}" style="margin-bottom:0.5rem"/>
+    <label>المجموعة</label>
+    <select id="editRGroup" style="margin-bottom:0.5rem">
+      <option value="big" ${(p.group||'')==='big'?'selected':''}>🔵 الكبار</option>
+      <option value="mid" ${(p.group||'')==='mid'?'selected':''}>🟡 الوسط</option>
+      <option value="small" ${(p.group||'')==='small'?'selected':''}>🟢 الصغار</option>
+    </select>
+    <label>المركز</label>
+    <select id="editRPos" style="margin-bottom:0.5rem">
+      <option value="fwd" ${p.pos==='fwd'?'selected':''}>⚡ مهاجم</option>
+      <option value="rw" ${p.pos==='rw'?'selected':''}>↗️ جناح أيمن</option>
+      <option value="lw" ${p.pos==='lw'?'selected':''}>↖️ جناح أيسر</option>
+      <option value="mid" ${p.pos==='mid'?'selected':''}>🔄 وسط</option>
+      <option value="rb" ${p.pos==='rb'?'selected':''}>🛡️ مدافع أيمن</option>
+      <option value="lb" ${p.pos==='lb'?'selected':''}>🛡️ مدافع أيسر</option>
+      <option value="def" ${p.pos==='def'?'selected':''}>🛡️ مدافع</option>
+      <option value="gk" ${p.pos==='gk'?'selected':''}>🧤 حارس</option>
+    </select>
+  `,[
+    {label:'حفظ',cls:'btn-green',action:()=>{
+      p.name=document.getElementById('editRName').value.trim()||p.name;
+      p.group=document.getElementById('editRGroup').value;
+      p.pos=document.getElementById('editRPos').value;
+      renderRPlayersList();renderPlayerCards();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
 window.removeRPlayer=function(id){showModal('حذف لاعب','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});renderRPlayersList();renderPlayerCards();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.confirmResetWeek=function(){showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[{label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers')renderRPlayersList();};
@@ -462,7 +493,7 @@ window.renderSubList=function(){
   let players=[...state.subPlayers];
   if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
   if(subFilter!=='all')players=players.filter(p=>{const s=getSubStatus(p);return s===subFilter||(subFilter==='active'&&s==='expiring');});
-  if(subGroupFilter!=='all')players=players.filter(p=>p.group===subGroupFilter);
+  if(subGroupFilter!=='all')players=players.filter(p=>(p.group||'')===subGroupFilter);
   if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
   el.innerHTML=players.map(p=>{
     const status=getSubStatus(p);
@@ -481,6 +512,7 @@ window.renderSubList=function(){
         <div class="sub-actions">
           <button class="btn btn-green btn-sm" onclick="renewSub('${p.id}')">🔄 تجديد</button>
           ${p.stopped?`<button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="showResumeSub('${p.id}')">▶️ استكمال</button>`:`<button class="btn btn-orange btn-sm" onclick="showStopSub('${p.id}')">⏸ إيقاف</button>`}
+          <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️</button>
         </div>
       </div>
@@ -538,6 +570,33 @@ window.showResumeSub=function(id){
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
+window.editSubPlayer=function(id){
+  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  showModal('✏️ تعديل بيانات اللاعب','',`
+    <label>الاسم</label><input id="editSName" value="${p.name}" style="margin-bottom:0.5rem"/>
+    <label>المجموعة</label>
+    <select id="editSGroup" style="margin-bottom:0.5rem">
+      <option value="big" ${(p.group||'')==='big'?'selected':''}>🔵 الكبار</option>
+      <option value="mid" ${(p.group||'')==='mid'?'selected':''}>🟡 الوسط</option>
+      <option value="small" ${(p.group||'')==='small'?'selected':''}>🟢 الصغار</option>
+    </select>
+    <label>سنة الميلاد</label><input id="editSBirth" value="${p.birthYear||''}" type="number" style="margin-bottom:0.5rem"/>
+    <label>رقم التيشيرت</label><input id="editSJersey" value="${p.jersey||''}" type="number" style="margin-bottom:0.5rem"/>
+    <label>تاريخ الاشتراك</label><input id="editSStart" type="date" value="${p.startDate||''}" style="margin-bottom:0.5rem"/>
+    <label>تاريخ الانتهاء</label><input id="editSEnd" type="date" value="${p.endDate||''}"/>
+  `,[
+    {label:'حفظ',cls:'btn-green',action:()=>{
+      p.name=document.getElementById('editSName').value.trim()||p.name;
+      p.group=document.getElementById('editSGroup').value;
+      p.birthYear=document.getElementById('editSBirth').value;
+      p.jersey=document.getElementById('editSJersey').value;
+      p.startDate=document.getElementById('editSStart').value;
+      p.endDate=document.getElementById('editSEnd').value;
+      renderSubList();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
 window.deleteSubPlayer=function(id){showModal('حذف','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.subPlayers=state.subPlayers.filter(p=>p.id!==id);renderSubList();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 function renderAlerts(){
   const el=document.getElementById('alertsList');const now=new Date();
@@ -557,7 +616,7 @@ window.renderAttList=function(){
   const date=document.getElementById('attDate').value;
   if(!date){el.innerHTML='<p class="empty-msg">اختر تاريخاً أولاً</p>';sumEl.innerHTML='';return;}
   let allPlayers=getAllPlayers();
-  if(attGroup!=='all') allPlayers=allPlayers.filter(p=>p.group===attGroup);
+  if(attGroup!=='all') allPlayers=allPlayers.filter(p=>(p.group||'')===attGroup);
   if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
   if(!state.attendance[date])state.attendance[date]={};
   const present=allPlayers.filter(p=>state.attendance[date][p.id]==='present').length;
