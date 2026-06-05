@@ -400,7 +400,7 @@ function renderRatingAll(){
   document.getElementById('dayPills').innerHTML=DAYS.map((d,i)=>{const wk=new Date(currentWeekKey());const off=[6,0,1,2,3,4,5];const dd=new Date(wk);dd.setDate(wk.getDate()+off[i]);const ds=dd.toLocaleDateString('en-GB',{day:'numeric',month:'numeric'});return`<button class="day-pill ${i===state.currentDay?'active':''}" onclick="selectDay(${i})">${d}<br><span style="font-size:0.65rem;opacity:0.8">${ds}</span></button>`;}).join('');
   renderPlayerCards();renderLeaderboard();renderRPlayersList();
 }
-window.selectDay=function(i){state.currentDay=i;openCard=null;renderPlayerCards();document.querySelectorAll('.day-pill').forEach((b,idx)=>b.className='day-pill'+(idx===i?' active':''));};
+window.selectDay=function(i){state.currentDay=i;openCard=null;renderPlayerCards();document.querySelectorAll('#dayPills .day-pill').forEach((b,idx)=>b.className='day-pill'+(idx===i?' active':''));};
 function renderPlayerCards(){
   const el=document.getElementById('playerCards');
   if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">أضف لاعبين من تبويب "اللاعبون"</p>';return;}
@@ -621,7 +621,7 @@ window.renderAttList=function(){
   if(!state.attendance[date])state.attendance[date]={};
   const present=allPlayers.filter(p=>state.attendance[date][p.id]==='present').length;
   const absent=allPlayers.filter(p=>state.attendance[date][p.id]==='absent').length;
-  const dayName=DAYS[new Date(date).getDay()];
+  const parts=date.split('-');const localDate=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));const dayName=DAYS[localDate.getDay()];
   sumEl.innerHTML=`<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
     <div style="flex:1;background:#00c85322;border:1px solid #00c85344;border-radius:8px;padding:0.5rem;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:var(--green)">${present}</div><div style="font-size:0.72rem;color:var(--muted)">حاضر</div></div>
     <div style="flex:1;background:#ff174422;border:1px solid #ff174433;border-radius:8px;padding:0.5rem;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:var(--red)">${absent}</div><div style="font-size:0.72rem;color:var(--muted)">غائب</div></div>
@@ -659,7 +659,7 @@ function renderHistory(){
     const att=state.attendance[date]||{};
     const present=allP.filter(p=>att[p.id]==='present');
     const absent=allP.filter(p=>att[p.id]==='absent');
-    const dayName=DAYS[new Date(date).getDay()];
+    const parts=date.split('-');const localDate=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));const dayName=DAYS[localDate.getDay()];
     return`<div class="section" style="margin-bottom:0.65rem">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
         <div style="font-weight:800;font-size:0.88rem">${dayName} — ${date}</div>
