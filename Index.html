@@ -663,9 +663,10 @@ function renderHistory(){
     return`<div class="section" style="margin-bottom:0.65rem">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
         <div style="font-weight:800;font-size:0.88rem">${dayName} — ${date}</div>
-        <div style="display:flex;gap:0.35rem">
+        <div style="display:flex;gap:0.35rem;align-items:center">
           <span style="color:var(--green);font-size:0.8rem;font-weight:700">✅${present.length}</span>
           <span style="color:var(--red);font-size:0.8rem;font-weight:700">❌${absent.length}</span>
+          <button class="btn btn-red btn-sm" onclick="deleteAttDay('${date}')">🗑️</button>
         </div>
       </div>
       ${present.length?`<div style="font-size:0.78rem;color:var(--green);margin-bottom:0.25rem"><strong>الحضور:</strong> ${present.map(p=>p.name).join('، ')}</div>`:''}
@@ -673,6 +674,16 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
+window.deleteAttDay=function(date){
+  showModal('🗑️ حذف سجل الحضور',`هل تريد حذف سجل يوم ${date}؟`,'',[
+    {label:'حذف',cls:'btn-red',action:()=>{
+      delete state.attendance[date];
+      renderHistory();
+      closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
 function populateMonthFilter(){
   const sel=document.getElementById('attMonth');
   const months=[...new Set(Object.keys(state.attendance).map(d=>d.slice(0,7)))].sort().reverse();
