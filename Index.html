@@ -319,7 +319,7 @@ import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/1
 const app = initializeApp({ databaseURL: 'https://academy-skills-default-rtdb.firebaseio.com' });
 const db = getDatabase(app);
 
-const DAYS=['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const CRITERIA=[
   {id:'attendance',label:'✅ الحضور',max:1},{id:'effort',label:'💪 الجهد',max:2},
   {id:'instructions',label:'📢 التعليمات',max:2},{id:'skill',label:'⚽ المهارة',max:2},
