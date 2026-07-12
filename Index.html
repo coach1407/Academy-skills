@@ -431,7 +431,33 @@ function renderLeaderboard(){
   el.innerHTML=`${overall}${byGroup}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
 }
 function renderBoard(title,players){if(!players.length)return'';const medals=['🥇','🥈','🥉'];const rows=players.slice(0,3).map((p,i)=>`<div class="board-row"><div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}</div><div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div></div>`).join('');return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;}
-window.addRatingPlayer=function(){const name=document.getElementById('rNewName').value.trim(),pos=document.getElementById('rNewPos').value,group=document.getElementById('rNewGroup').value;if(!name)return;state.ratingPlayers.push({id:Date.now().toString(),name,pos,group});document.getElementById('rNewName').value='';renderRPlayersList();renderPlayerCards();};
+window.addRatingPlayer=function(){
+  const name=document.getElementById('rNewName').value.trim();
+  const pos=document.getElementById('rNewPosManual').value;
+  const group=document.getElementById('rNewGroupManual').value;
+  if(!name)return;
+  if(state.ratingPlayers.find(p=>p.name===name)){alert('هذا اللاعب موجود بالفعل في قائمة التقييم');return;}
+  state.ratingPlayers.push({id:Date.now().toString(),name,pos,group});
+  document.getElementById('rNewName').value='';
+  renderRPlayersList();renderPlayerCards();
+};
+window.renderSubPlayersToAdd=function(){
+  const group=document.getElementById('rAddGroup').value;
+  const sel=document.getElementById('rSelectPlayer');
+  const existing=state.ratingPlayers.map(p=>p.name);
+  const available=state.subPlayers.filter(p=>(p.group||'')=== group && !existing.includes(p.name));
+  sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+available.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+};
+window.addRatingPlayerFromSub=function(){
+  const selId=document.getElementById('rSelectPlayer').value;
+  const pos=document.getElementById('rNewPos').value;
+  if(!selId){alert('اختر لاعباً أولاً');return;}
+  const subP=state.subPlayers.find(p=>p.id===selId);
+  if(!subP)return;
+  if(state.ratingPlayers.find(p=>p.name===subP.name)){alert('هذا اللاعب موجود بالفعل');return;}
+  state.ratingPlayers.push({id:Date.now().toString(),name:subP.name,pos,group:subP.group||'big'});
+  renderSubPlayersToAdd();renderRPlayersList();renderPlayerCards();
+};
 function renderRPlayersList(){const el=document.getElementById('rPlayersList');if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}const groupColors={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
   el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}<br><span style="font-size:0.7rem;color:${groupColors[p.group]||'var(--muted)'}">${GROUP_LABEL[p.group||'']||'لم تُحدد'}</span></div><button class="btn btn-blue btn-sm" onclick="editRPlayer('${p.id}')" style="margin-left:0.3rem">✏️</button><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">🗑️</button></div>`).join('');}
 window.editRPlayer=function(id){
@@ -467,7 +493,7 @@ window.editRPlayer=function(id){
 };
 window.removeRPlayer=function(id){showModal('حذف لاعب','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});renderRPlayersList();renderPlayerCards();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.confirmResetWeek=function(){showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[{label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
-window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers')renderRPlayersList();};
+window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers'){renderRPlayersList();renderSubPlayersToAdd();}};
 
 // ===== SUBSCRIPTIONS =====
 window.autoSetEndDate=function(){
