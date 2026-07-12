@@ -513,6 +513,7 @@ window.renderSubList=function(){
         <div class="sub-actions">
           <button class="btn btn-green btn-sm" onclick="renewSub('${p.id}')">🔄 تجديد</button>
           ${p.stopped?`<button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="showResumeSub('${p.id}')">▶️ استكمال</button>`:`<button class="btn btn-orange btn-sm" onclick="showStopSub('${p.id}')">⏸ إيقاف</button>`}
+          <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="addCompDays('${p.id}')">➕ تعويض</button>
           <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️</button>
         </div>
@@ -550,26 +551,39 @@ window.showStopSub=function(id){
 window.showResumeSub=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   const today=new Date().toISOString().slice(0,10);
+  // حساب تاريخ الانتهاء الجديد تلقائياً بناءً على فترة الإيقاف
+  let autoNewEnd='';
+  if(p.stopDate&&p.endDate){
+    const stopD=new Date(p.stopDate),resumeD=new Date(today);
+    const pauseDays=Math.ceil((resumeD-stopD)/(1000*60*60*24));
+    const oldEnd=new Date(p.endDate);oldEnd.setDate(oldEnd.getDate()+pauseDays);
+    autoNewEnd=oldEnd.toISOString().slice(0,10);
+  }
   showModal('▶️ استكمال الاشتراك','',`
-    <label>تاريخ الاستكمال</label><input type="date" id="resumeDate" value="${today}"/>
-    <label style="margin-top:0.5rem">تاريخ الانتهاء الجديد (يُحسب تلقائياً)</label><input type="date" id="newEndDate" value="${p.endDate||''}"/>
+    <label>تاريخ الاستكمال</label><input type="date" id="resumeDate" value="${today}" oninput="recalcEndDate('${p.stopDate||''}','${p.endDate||''}')"/>
+    <label style="margin-top:0.5rem">تاريخ الانتهاء الجديد (يُحسب تلقائياً)</label>
+    <input type="date" id="newEndDate" value="${autoNewEnd||p.endDate||''}" style="color:var(--gold)"/>
+    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">⚡ يُحسب تلقائياً بإضافة فترة الإيقاف</div>
   `,[
     {label:'استكمال',cls:'btn-green',action:()=>{
       const resumeDate=document.getElementById('resumeDate').value;
       const newEndDate=document.getElementById('newEndDate').value;
       if(resumeDate){
-        // حساب فترة التوقف وإضافتها لتاريخ الانتهاء
-        if(p.stopDate&&p.endDate&&!newEndDate){
-          const stopD=new Date(p.stopDate),resumeD=new Date(resumeDate);
-          const pauseDays=Math.ceil((resumeD-stopD)/(1000*60*60*24));
-          const oldEnd=new Date(p.endDate);oldEnd.setDate(oldEnd.getDate()+pauseDays);
-          p.endDate=oldEnd.toISOString().slice(0,10);
-        } else if(newEndDate){ p.endDate=newEndDate; }
+        p.endDate=newEndDate||p.endDate;
         p.stopped=false;p.resumeDate=resumeDate;renderSubList();
       }closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
+};
+window.recalcEndDate=function(stopDate,oldEnd){
+  const resumeVal=document.getElementById('resumeDate').value;
+  if(stopDate&&oldEnd&&resumeVal){
+    const stopD=new Date(stopDate),resumeD=new Date(resumeVal);
+    const pauseDays=Math.ceil((resumeD-stopD)/(1000*60*60*24));
+    const endD=new Date(oldEnd);endD.setDate(endD.getDate()+pauseDays);
+    document.getElementById('newEndDate').value=endD.toISOString().slice(0,10);
+  }
 };
 window.editSubPlayer=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
@@ -583,8 +597,8 @@ window.editSubPlayer=function(id){
     </select>
     <label>سنة الميلاد</label><input id="editSBirth" value="${p.birthYear||''}" type="number" style="margin-bottom:0.5rem"/>
     <label>رقم التيشيرت</label><input id="editSJersey" value="${p.jersey||''}" type="number" style="margin-bottom:0.5rem"/>
-    <label>تاريخ الاشتراك</label><input id="editSStart" type="date" value="${p.startDate||''}" style="margin-bottom:0.5rem"/>
-    <label>تاريخ الانتهاء</label><input id="editSEnd" type="date" value="${p.endDate||''}"/>
+    <label>تاريخ بداية الاشتراك</label><input id="editSStart" type="date" value="${p.startDate||''}" style="margin-bottom:0.5rem" oninput="autoEditEndDate()"/>
+    <label>تاريخ الانتهاء (يُحسب تلقائياً)</label><input id="editSEnd" type="date" value="${p.endDate||''}"/>
   `,[
     {label:'حفظ',cls:'btn-green',action:()=>{
       p.name=document.getElementById('editSName').value.trim()||p.name;
@@ -597,6 +611,42 @@ window.editSubPlayer=function(id){
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
+};
+window.autoEditEndDate=function(){
+  const start=document.getElementById('editSStart').value;
+  if(!start)return;
+  const d=new Date(start);d.setMonth(d.getMonth()+1);
+  document.getElementById('editSEnd').value=d.toISOString().slice(0,10);
+};
+window.addCompDays=function(id){
+  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  showModal('➕ إضافة أيام تعويضية','',`
+    <label>عدد الأيام المراد إضافتها</label>
+    <input type="number" id="compDays" value="1" min="1" max="30" style="margin-bottom:0.5rem"/>
+    <label>تاريخ الانتهاء الحالي</label>
+    <input type="date" id="compCurrentEnd" value="${p.endDate||''}" disabled style="opacity:0.6;margin-bottom:0.5rem"/>
+    <label>تاريخ الانتهاء الجديد</label>
+    <input type="date" id="compNewEnd" value="${p.endDate||''}" style="color:var(--gold)"/>
+    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">⚡ أدخل عدد الأيام وسيُحسب التاريخ تلقائياً</div>
+  `,[
+    {label:'إضافة',cls:'btn-green',action:()=>{
+      const days=parseInt(document.getElementById('compDays').value)||0;
+      if(days>0&&p.endDate){
+        const d=new Date(p.endDate);d.setDate(d.getDate()+days);
+        p.endDate=d.toISOString().slice(0,10);
+        renderSubList();
+      }closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+  setTimeout(()=>{
+    const inp=document.getElementById('compDays');
+    if(inp) inp.oninput=function(){
+      const days=parseInt(this.value)||0;
+      const cur=document.getElementById('compCurrentEnd').value;
+      if(cur&&days>0){const d=new Date(cur);d.setDate(d.getDate()+days);document.getElementById('compNewEnd').value=d.toISOString().slice(0,10);}
+    };
+  },100);
 };
 window.deleteSubPlayer=function(id){showModal('حذف','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.subPlayers=state.subPlayers.filter(p=>p.id!==id);renderSubList();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 function renderAlerts(){
