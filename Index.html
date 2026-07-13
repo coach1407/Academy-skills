@@ -186,25 +186,28 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   <div class="tab-content" id="tab-leaderboard"><div id="leaderboardContent"></div></div>
   <div class="tab-content" id="tab-rplayers">
     <div class="section">
-      <div class="section-title">➕ إضافة لاعب</div>
+      <div class="section-title">➕ إضافة لاعب للتقييم</div>
       <div class="form-grid">
-        <div><label>الاسم</label><input id="rNewName" placeholder="اسم اللاعب"/></div>
-        <div class="form-full"><label>المجموعة</label>
-          <select id="rNewGroup">
+        <div class="form-full"><label>تصفية المجموعة</label>
+          <select id="rAddGroup" onchange="refreshPlayerDropdown()" style="margin-bottom:0.5rem">
+            <option value="all">الكل</option>
             <option value="big">🔵 الكبار</option>
             <option value="mid">🟡 الوسط</option>
             <option value="small">🟢 الصغار</option>
           </select></div>
-        <div><label>المركز</label>
+        <div class="form-full"><label>اختر اللاعب</label>
+          <select id="rSelectPlayer" style="margin-bottom:0.5rem">
+            <option value="">-- اختر لاعباً --</option>
+          </select></div>
+        <div class="form-full"><label>المركز</label>
           <select id="rNewPos">
             <option value="fwd">⚡ مهاجم</option><option value="rw">↗️ جناح أيمن</option>
             <option value="lw">↖️ جناح أيسر</option><option value="mid">🔄 وسط</option>
             <option value="rb">🛡️ مدافع أيمن</option><option value="lb">🛡️ مدافع أيسر</option>
             <option value="def">🛡️ مدافع</option><option value="gk">🧤 حارس</option>
-          </select>
-        </div>
+          </select></div>
       </div>
-      <button class="btn btn-green" onclick="addRatingPlayer()" style="width:100%">إضافة</button>
+      <button class="btn btn-green" onclick="addFromDropdown()" style="width:100%;margin-top:0.5rem">➕ إضافة للتقييم</button>
     </div>
     <div id="rPlayersList"></div>
     <div class="danger-zone">
@@ -212,7 +215,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <button class="btn btn-red btn-sm" onclick="confirmResetWeek()">🗑️ إعادة ضبط</button>
     </div>
   </div>
-</div>
 
 <!-- ===== SUBSCRIPTIONS PAGE ===== -->
 
@@ -367,6 +369,26 @@ window.filterSubGroup=function(g,btn){subGroupFilter=g;document.querySelectorAll
 
 const GROUP_LABEL={big:'🔵 الكبار',mid:'🟡 الوسط',small:'🟢 الصغار',all:'الكل'};
 
+window.refreshPlayerDropdown=function(){
+  const grpEl=document.getElementById('rAddGroup');
+  const sel=document.getElementById('rSelectPlayer');
+  if(!sel)return;
+  const group=grpEl?grpEl.value:'all';
+  const existing=state.ratingPlayers.map(p=>p.name);
+  const gl={big:'كبار',mid:'وسط',small:'صغار'};
+  const avail=state.subPlayers.filter(p=>!existing.includes(p.name)&&(group==='all'||(p.group||'')===group));
+  sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+avail.map(p=>`<option value="${p.id}">${p.name}${p.group?' ('+gl[p.group]+')':''}</option>`).join('');
+};
+window.addFromDropdown=function(){
+  const selEl=document.getElementById('rSelectPlayer');
+  const pos=document.getElementById('rNewPos').value;
+  if(!selEl||!selEl.value){alert('اختر لاعباً من القائمة');return;}
+  const sub=state.subPlayers.find(p=>p.id===selEl.value);
+  if(!sub)return;
+  if(state.ratingPlayers.find(p=>p.name===sub.name)){alert('هذا اللاعب مضاف بالفعل');return;}
+  state.ratingPlayers.push({id:Date.now().toString(),name:sub.name,pos,group:sub.group||'big'});
+  refreshPlayerDropdown();renderRPlayersList();renderPlayerCards();
+};
 function renderAll(){renderRatingAll();renderSubList();renderAttList();renderAlerts();renderAttStats();}
 
 window.switchMain=function(id,btn){
@@ -489,7 +511,7 @@ window.editRPlayer=function(id){
 };
 window.removeRPlayer=function(id){showModal('حذف لاعب','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});renderRPlayersList();renderPlayerCards();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
 window.confirmResetWeek=function(){showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[{label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
-window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers'){renderRPlayersList();renderSubPlayersToAdd();}};
+window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers'){renderRPlayersList();refreshPlayerDropdown();}};
 
 // ===== SUBSCRIPTIONS =====
 window.autoSetEndDate=function(){
