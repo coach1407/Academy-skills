@@ -239,7 +239,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <button class="btn btn-sm sub-expired" onclick="filterSub('expired')">❌ منتهي</button>
       <button class="btn btn-sm sub-stopped" onclick="filterSub('stopped')">⏸ موقوف</button>
     </div>
-    <div class="filter-row">
+    <div class="filter-row" id="subGroupFilterRow">
       <button class="day-pill active" onclick="filterSubGroup('all',this)">الكل</button>
       <button class="day-pill" onclick="filterSubGroup('big',this)">🔵 الكبار</button>
       <button class="day-pill" onclick="filterSubGroup('mid',this)">🟡 الوسط</button>
@@ -531,7 +531,7 @@ function renderPlayerCards(){
     return`<div class="player-card">
       <div class="player-header" onclick="toggleCard('${p.id}')">
         <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
-        <div class="player-name">${p.name}</div>
+        <div class="player-name">${p.name}<br><span style="font-size:0.7rem;color:var(--muted)">${POS_LABEL[p.pos]||''}</span></div>
         <div class="player-total ${ds===0?'zero':''}" id="score-${p.id}">${ds}</div>
         <div class="chevron ${isOpen?'open':''}">▼</div>
       </div>
@@ -716,7 +716,7 @@ function getSubStatus(p){
 window.filterSub=function(f){subFilter=f;renderSubList();};
 window.filterSubGroup=function(g,btn){
   subGroupFilter=g;
-  document.querySelectorAll('#sub-list .filter-row:last-of-type .day-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#subGroupFilterRow .day-pill').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   renderSubList();
 };
@@ -755,6 +755,7 @@ window.renderSubList=function(){
         </div>
         ${p.stopDate?`<div class="info-row"><span class="info-label">تاريخ الإيقاف</span><span class="info-val" style="color:#ff6d00">${p.stopDate}</span></div>`:''}
         ${p.resumeDate?`<div class="info-row"><span class="info-label">تاريخ الاستكمال</span><span class="info-val" style="color:var(--green)">${p.resumeDate}</span></div>`:''}
+        ${(p.compDaysTotal&&p.compDaysTotal>0)?`<div class="info-row"><span class="info-label">أيام التعويض المضافة</span><span class="info-val" style="color:#ce93d8">+${p.compDaysTotal} يوم</span></div>`:''}
         <div class="sub-actions">
           <button class="btn btn-green btn-sm" onclick="renewSub('${p.id}')">🔄 تجديد</button>
           ${p.stopped?
@@ -868,10 +869,11 @@ window.recalcResume=function(stopDate,oldEnd){
 window.addCompDays=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   showModal('➕ أيام تعويضية','',`
-    <label>عدد الأيام</label>
+    <label>عدد الأيام التعويضية</label>
     <input type="number" id="compDays" value="1" min="1" max="30"/>
     <label>تاريخ الانتهاء الحالي</label>
     <input type="date" value="${p.endDate||''}" disabled style="opacity:0.6"/>
+    <div style="font-size:0.73rem;color:#ce93d8;margin-top:0.3rem">إجمالي أيام التعويض السابقة: ${p.compDaysTotal||0} يوم</div>
   `,[
     {label:'إضافة',cls:'btn-green',action:()=>{
       const days=parseInt(document.getElementById('compDays').value)||0;
@@ -879,6 +881,7 @@ window.addCompDays=function(id){
         const d=new Date(p.endDate);
         d.setDate(d.getDate()+days);
         p.endDate=d.toISOString().slice(0,10);
+        p.compDaysTotal=(p.compDaysTotal||0)+days;
       }
       renderSubList();closeModal();
     }},
