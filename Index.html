@@ -14,7 +14,7 @@ header{text-align:center;padding:1.25rem 1rem 0.4rem;}
 header h1{font-size:1.7rem;font-weight:900;color:var(--green);text-shadow:0 0 30px var(--green-glow);}
 header p{color:var(--muted);font-size:0.82rem;margin-top:0.15rem;}
 .main-tabs{display:flex;background:var(--card);border-bottom:2px solid var(--border);}
-.main-tab{flex:1;padding:0.75rem 0.5rem;font-family:Tajawal,sans-serif;font-size:0.8rem;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+.main-tab{flex:1;padding:0.75rem 0.5rem;font-family:Tajawal,sans-serif;font-size:0.8rem;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;}
 .main-tab.active{color:var(--green);border-bottom-color:var(--green);}
 .page{display:none;}.page.active{display:block;}
 .sync-bar{display:flex;justify-content:center;align-items:center;gap:0.75rem;padding:0.5rem 1rem;background:var(--card);border-bottom:1px solid var(--border);}
@@ -26,18 +26,18 @@ header p{color:var(--muted);font-size:0.82rem;margin-top:0.15rem;}
 .spinner{display:inline-block;width:11px;height:11px;border:2px solid #0003;border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;display:inline-block;margin-left:3px;}
-.pad{padding:1rem;}
-input,select,textarea{font-family:Tajawal,sans-serif;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:0.55rem 0.7rem;font-size:0.88rem;outline:none;width:100%;}
+input,select{font-family:Tajawal,sans-serif;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:0.55rem 0.7rem;font-size:0.88rem;outline:none;width:100%;}
 input:focus,select:focus{border-color:var(--green);}
 input::placeholder{color:var(--muted);}
 select option{background:#0a1a0f;}
-.btn{font-family:Tajawal,sans-serif;font-weight:700;padding:0.55rem 1.1rem;border:none;border-radius:8px;cursor:pointer;font-size:0.88rem;transition:all 0.2s;}
+.btn{font-family:Tajawal,sans-serif;font-weight:700;padding:0.55rem 1.1rem;border:none;border-radius:8px;cursor:pointer;font-size:0.88rem;}
 .btn-green{background:var(--green);color:#000;}
 .btn-gold{background:var(--gold);color:#000;}
 .btn-blue{background:var(--blue);color:#fff;}
 .btn-red{background:#ff174422;color:var(--red);border:1px solid #ff174433;}
 .btn-sm{padding:0.28rem 0.65rem;font-size:0.76rem;border-radius:6px;}
 .btn-orange{background:#ff6d0022;color:#ff6d00;border:1px solid #ff6d0033;}
+.btn-purple{background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;}
 .form-full{grid-column:1/-1;}
 label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
@@ -48,7 +48,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 .sub-tab{flex:1;padding:0.6rem 0.4rem;font-family:Tajawal,sans-serif;font-size:0.78rem;font-weight:700;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
 .sub-tab.active{color:var(--green);border-bottom-color:var(--green);}
 .sub-page{display:none;padding:0.9rem;}.sub-page.active{display:block;}
-/* PLAYER SUB CARDS */
 .player-sub-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:0.65rem;overflow:hidden;}
 .player-sub-header{display:flex;align-items:center;padding:0.65rem 0.9rem;gap:0.65rem;cursor:pointer;}
 .jersey{width:32px;height:32px;border-radius:8px;background:var(--green);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.82rem;flex-shrink:0;}
@@ -64,14 +63,12 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 .info-label{color:var(--muted);}
 .info-val{font-weight:700;}
 .sub-actions{display:flex;gap:0.35rem;flex-wrap:wrap;margin-top:0.25rem;}
-/* ATTENDANCE */
 .att-row{display:flex;align-items:center;padding:0.55rem 0.9rem;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:0.4rem;gap:0.65rem;}
 .att-name{flex:1;font-weight:700;font-size:0.85rem;}
 .att-btns{display:flex;gap:0.35rem;}
 .att-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .att-btn.present{background:#00c85322;border-color:var(--green);}
 .att-btn.absent{background:#ff174422;border-color:var(--red);}
-/* RATING */
 .week-bar{display:flex;justify-content:center;align-items:center;gap:0.65rem;padding:0.65rem 1rem;background:var(--card);border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .wk-btn{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.22rem 0.6rem;cursor:pointer;font-size:0.95rem;font-family:Tajawal,sans-serif;}
 .tabs{display:flex;overflow-x:auto;border-bottom:2px solid var(--border);background:var(--card);}
@@ -81,6 +78,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 .day-pill{padding:0.3rem 0.8rem;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-family:Tajawal,sans-serif;font-size:0.78rem;font-weight:600;}
 .day-pill.active{background:var(--green);color:#000;border-color:var(--green);}
 .rating-day-select{display:flex;gap:0.35rem;margin-bottom:0.9rem;flex-wrap:wrap;}
+.group-filter{display:flex;gap:0.35rem;margin-bottom:0.7rem;flex-wrap:wrap;}
 .player-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:0.55rem;}
 .player-header{display:flex;align-items:center;padding:0.6rem 0.85rem;gap:0.6rem;cursor:pointer;}
 .player-pos{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;flex-shrink:0;}
@@ -125,20 +123,17 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 .danger-zone p{color:var(--muted);font-size:0.73rem;margin-bottom:0.55rem;}
 .modal-overlay{display:none;position:fixed;inset:0;background:#000a;z-index:100;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;max-width:340px;width:92%;text-align:center;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;max-width:340px;width:92%;text-align:center;max-height:90vh;overflow-y:auto;}
 .modal h3{color:var(--green);margin-bottom:0.7rem;font-size:1rem;}
 .modal p{color:var(--muted);font-size:0.83rem;margin-bottom:0.9rem;line-height:1.6;}
 .modal-btns{display:flex;gap:0.45rem;justify-content:center;flex-wrap:wrap;}
 .modal-body{text-align:right;margin-bottom:0.9rem;}
 .modal-body label{font-size:0.78rem;color:var(--muted);margin-bottom:0.2rem;display:block;}
-.modal-body input{margin-bottom:0.5rem;}
+.modal-body input,.modal-body select{margin-bottom:0.5rem;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:0.9rem;}
 .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.65rem;text-align:center;}
 .stat-num{font-size:1.5rem;font-weight:900;color:var(--green);}
-.stat-num.red{color:var(--red);}
 .stat-num.gold{color:var(--gold);}
-.stat-label{font-size:0.7rem;color:var(--muted);margin-top:0.15rem;}
-.month-header{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:0.5rem;font-weight:700;font-size:0.85rem;color:var(--gold);}
 .att-summary-row{display:flex;align-items:center;padding:0.5rem 0.85rem;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:0.35rem;gap:0.6rem;}
 .search-box{margin-bottom:0.7rem;}
 .filter-row{display:flex;gap:0.35rem;margin-bottom:0.7rem;flex-wrap:wrap;}
@@ -159,7 +154,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   <button class="main-tab" onclick="switchMain('attendance',this)">✅ الحضور</button>
 </div>
 
-<!-- ===== RATING PAGE ===== -->
+<!-- ===== RATING ===== -->
 
 <div class="page active" id="page-rating">
   <div class="week-bar">
@@ -173,13 +168,13 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="tab" onclick="switchTab('rplayers',this)">👥 اللاعبون</button>
   </div>
   <div class="tab-content active" id="tab-daily">
-    <div style="display:flex;gap:0.4rem;margin-bottom:0.6rem;flex-wrap:wrap;">
-    <button class="day-pill active" onclick="setRatingGroup('all',this)" id="rg-all">الكل</button>
-    <button class="day-pill" onclick="setRatingGroup('big',this)" id="rg-big">🔵 الكبار</button>
-    <button class="day-pill" onclick="setRatingGroup('mid',this)" id="rg-mid">🟡 الوسط</button>
-    <button class="day-pill" onclick="setRatingGroup('small',this)" id="rg-small">🟢 الصغار</button>
-  </div>
-  <div class="rating-day-select" id="dayPills"></div>
+    <div class="group-filter">
+      <button class="day-pill active" id="rg-all" onclick="setRatingGroup('all',this)">الكل</button>
+      <button class="day-pill" id="rg-big" onclick="setRatingGroup('big',this)">🔵 الكبار</button>
+      <button class="day-pill" id="rg-mid" onclick="setRatingGroup('mid',this)">🟡 الوسط</button>
+      <button class="day-pill" id="rg-small" onclick="setRatingGroup('small',this)">🟢 الصغار</button>
+    </div>
+    <div class="rating-day-select" id="dayPills"></div>
     <div id="playerCards"></div>
     <div class="save-row"><button class="btn btn-gold" onclick="saveAll()">☁️ حفظ</button></div>
   </div>
@@ -188,35 +183,47 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <div class="section">
       <div class="section-title">➕ إضافة لاعب للتقييم</div>
       <div class="form-grid">
-        <div class="form-full"><label>تصفية المجموعة</label>
-          <select id="rAddGroup" onchange="refreshPlayerDropdown()" style="margin-bottom:0.5rem">
+        <div class="form-full">
+          <label>تصفية حسب المجموعة</label>
+          <select id="rAddGroup" onchange="refreshPlayerDropdown()">
             <option value="all">الكل</option>
             <option value="big">🔵 الكبار</option>
             <option value="mid">🟡 الوسط</option>
             <option value="small">🟢 الصغار</option>
-          </select></div>
-        <div class="form-full"><label>اختر اللاعب</label>
-          <select id="rSelectPlayer" style="margin-bottom:0.5rem">
+          </select>
+        </div>
+        <div class="form-full" style="margin-top:0.5rem">
+          <label>اختر اللاعب</label>
+          <select id="rSelectPlayer">
             <option value="">-- اختر لاعباً --</option>
-          </select></div>
-        <div class="form-full"><label>المركز</label>
+          </select>
+        </div>
+        <div class="form-full" style="margin-top:0.5rem">
+          <label>المركز</label>
           <select id="rNewPos">
-            <option value="fwd">⚡ مهاجم</option><option value="rw">↗️ جناح أيمن</option>
-            <option value="lw">↖️ جناح أيسر</option><option value="mid">🔄 وسط</option>
-            <option value="rb">🛡️ مدافع أيمن</option><option value="lb">🛡️ مدافع أيسر</option>
-            <option value="def">🛡️ مدافع</option><option value="gk">🧤 حارس</option>
-          </select></div>
+            <option value="fwd">⚡ مهاجم</option>
+            <option value="rw">↗️ جناح أيمن</option>
+            <option value="lw">↖️ جناح أيسر</option>
+            <option value="mid">🔄 وسط</option>
+            <option value="rb">🛡️ مدافع أيمن</option>
+            <option value="lb">🛡️ مدافع أيسر</option>
+            <option value="def">🛡️ مدافع</option>
+            <option value="gk">🧤 حارس</option>
+          </select>
+        </div>
       </div>
       <button class="btn btn-green" onclick="addFromDropdown()" style="width:100%;margin-top:0.5rem">➕ إضافة للتقييم</button>
     </div>
     <div id="rPlayersList"></div>
     <div class="danger-zone">
-      <h3>⚠️ منطقة الخطر</h3><p>إعادة ضبط تقييمات الأسبوع الحالي</p>
+      <h3>⚠️ منطقة الخطر</h3>
+      <p>إعادة ضبط تقييمات الأسبوع الحالي</p>
       <button class="btn btn-red btn-sm" onclick="confirmResetWeek()">🗑️ إعادة ضبط</button>
     </div>
   </div>
+</div>
 
-<!-- ===== SUBSCRIPTIONS PAGE ===== -->
+<!-- ===== SUBSCRIPTIONS ===== -->
 
 <div class="page" id="page-subscriptions">
   <div class="sub-tabs">
@@ -232,7 +239,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <button class="btn btn-sm sub-expired" onclick="filterSub('expired')">❌ منتهي</button>
       <button class="btn btn-sm sub-stopped" onclick="filterSub('stopped')">⏸ موقوف</button>
     </div>
-    <div style="display:flex;gap:0.35rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+    <div class="filter-row">
       <button class="day-pill active" onclick="filterSubGroup('all',this)">الكل</button>
       <button class="day-pill" onclick="filterSubGroup('big',this)">🔵 الكبار</button>
       <button class="day-pill" onclick="filterSubGroup('mid',this)">🟡 الوسط</button>
@@ -262,7 +269,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   <div class="sub-page" id="sub-alerts"><div id="alertsList"></div></div>
 </div>
 
-<!-- ===== ATTENDANCE PAGE ===== -->
+<!-- ===== ATTENDANCE ===== -->
 
 <div class="page" id="page-attendance">
   <div class="sub-tabs">
@@ -275,27 +282,27 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       <input type="date" id="attDate" style="flex:1" oninput="renderAttList()"/>
       <button class="btn btn-sm btn-green" onclick="setAttToday()">اليوم</button>
     </div>
-    <div style="display:flex;gap:0.35rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+    <div class="filter-row">
       <button class="day-pill active" onclick="setAttGroup('all',this)">الكل</button>
       <button class="day-pill" onclick="setAttGroup('big',this)">🔵 الكبار</button>
       <button class="day-pill" onclick="setAttGroup('mid',this)">🟡 الوسط</button>
       <button class="day-pill" onclick="setAttGroup('small',this)">🟢 الصغار</button>
     </div>
-    <div id="attDaySummary" style="margin-bottom:0.6rem;"></div>
+    <div id="attDaySummary"></div>
     <div id="attList"></div>
     <div class="save-row"><button class="btn btn-gold" onclick="saveAll()">☁️ حفظ الحضور</button></div>
   </div>
   <div class="sub-page" id="att-history">
-    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:center;flex-wrap:wrap;">
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex:1;min-width:120px;"><label>من</label><input type="date" id="histFrom"/></div>
       <div style="flex:1;min-width:120px;"><label>إلى</label><input type="date" id="histTo"/></div>
-      <button class="btn btn-sm btn-green" onclick="renderHistory()" style="margin-top:1.2rem">بحث</button>
+      <button class="btn btn-sm btn-green" onclick="renderHistory()">بحث</button>
     </div>
     <div id="historyContent"></div>
   </div>
   <div class="sub-page" id="att-stats">
     <div style="display:flex;gap:0.5rem;margin-bottom:0.7rem;align-items:center;flex-wrap:wrap;">
-      <input id="attSearch" placeholder="🔍 بحث عن لاعب..." oninput="renderAttStats()" style="flex:1"/>
+      <input id="attSearch" placeholder="🔍 بحث..." oninput="renderAttStats()" style="flex:1"/>
       <select id="attMonth" onchange="renderAttStats()" style="width:auto">
         <option value="">كل الوقت</option>
       </select>
@@ -321,11 +328,16 @@ import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/1
 const app = initializeApp({ databaseURL: 'https://academy-skills-default-rtdb.firebaseio.com' });
 const db = getDatabase(app);
 
+// ===== CONSTANTS =====
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const CRITERIA=[
-  {id:'attendance',label:'✅ الحضور',max:1},{id:'effort',label:'💪 الجهد',max:2},
-  {id:'instructions',label:'📢 التعليمات',max:2},{id:'skill',label:'⚽ المهارة',max:2},
-  {id:'teamwork',label:'🤝 التعاون',max:1},{id:'spirit',label:'🔥 الروح',max:1},{id:'improvement',label:'📈 التحسن',max:1}
+  {id:'attendance',label:'✅ الحضور',max:1},
+  {id:'effort',label:'💪 الجهد',max:2},
+  {id:'instructions',label:'📢 التعليمات',max:2},
+  {id:'skill',label:'⚽ المهارة',max:2},
+  {id:'teamwork',label:'🤝 التعاون',max:1},
+  {id:'spirit',label:'🔥 الروح',max:1},
+  {id:'improvement',label:'📈 التحسن',max:1}
 ];
 const BONUS={
   gk:[{id:'saves',label:'تصدٍّ',pts:1},{id:'clean',label:'صفرية',pts:2}],
@@ -339,46 +351,270 @@ const BONUS={
 };
 const POS_LABEL={gk:'حارس',def:'مدافع',rb:'مدافع أيمن',lb:'مدافع أيسر',mid:'وسط',fwd:'مهاجم',rw:'جناح أيمن',lw:'جناح أيسر'};
 const POS_EMOJI={gk:'🧤',def:'🛡️',rb:'🛡️',lb:'🛡️',mid:'🔄',fwd:'⚡',rw:'↗️',lw:'↖️'};
+const GROUP_LABEL={big:'🔵 الكبار',mid:'🟡 الوسط',small:'🟢 الصغار'};
+const SUB_LABEL={active:'✅ فعال',expired:'❌ منتهي',stopped:'⏸ موقوف',expiring:'⚠️ ينتهي قريباً'};
+const SUB_CLASS={active:'sub-active',expired:'sub-expired',stopped:'sub-stopped',expiring:'sub-expiring'};
 
+// ===== STATE =====
 let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},currentDay:0};
-function getDayName(dateStr){const p=dateStr.split('-');return DAYS[new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])).getDay()];}
-let weekOffset=0,openCard=null,subFilter='all',subGroupFilter='all',ratingGroup='all',attGroup='all';
+let weekOffset=0, openCard=null, subFilter='all', subGroupFilter='all', ratingGroup='all', attGroup='all';
 
-function setSyncStatus(t,m){const el=document.getElementById('syncStatus');el.className='sync-status sync-'+t;el.innerHTML=m;}
+// ===== HELPERS =====
+function getDayName(dateStr){
+  const p=dateStr.split('-');
+  return DAYS[new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])).getDay()];
+}
+function setSyncStatus(t,m){
+  const el=document.getElementById('syncStatus');
+  el.className='sync-status sync-'+t;
+  el.innerHTML=m;
+}
 
+// ===== FIREBASE =====
 async function loadAll(){
   setSyncStatus('loading','جاري التحميل... <span class="spinner"></span>');
   try{
     const snap=await get(ref(db,'academy'));
-    if(snap.exists()){const d=snap.val();if(d.ratingPlayers)state.ratingPlayers=d.ratingPlayers;if(d.weeks)state.weeks=d.weeks;if(d.subPlayers)state.subPlayers=d.subPlayers;if(d.attendance)state.attendance=d.attendance;setSyncStatus('ok','✅ متصل');}
-    else setSyncStatus('ok','✅ جاهز');
-  }catch(e){setSyncStatus('err','⚠️ خطأ');}
-  renderAll();populateMonthFilter();
+    if(snap.exists()){
+      const d=snap.val();
+      if(d.ratingPlayers)state.ratingPlayers=d.ratingPlayers;
+      if(d.weeks)state.weeks=d.weeks;
+      if(d.subPlayers)state.subPlayers=d.subPlayers;
+      if(d.attendance)state.attendance=d.attendance;
+      setSyncStatus('ok','✅ متصل بالسحابة');
+    } else {
+      setSyncStatus('ok','✅ جاهز');
+    }
+  } catch(e){
+    setSyncStatus('err','⚠️ خطأ في الاتصال');
+  }
+  renderAll();
+  populateMonthFilter();
 }
 
 async function saveAll(){
-  const btn=document.getElementById('saveBtn');btn.innerHTML='⏳';btn.disabled=true;
-  try{await set(ref(db,'academy'),state);setSyncStatus('ok','✅ تم الحفظ');btn.innerHTML='✅';setTimeout(()=>{btn.innerHTML='☁️ حفظ';btn.disabled=false;},2000);}
-  catch(e){setSyncStatus('err','⚠️ فشل');btn.innerHTML='☁️ حفظ';btn.disabled=false;}
+  const btn=document.getElementById('saveBtn');
+  btn.innerHTML='⏳';btn.disabled=true;
+  try{
+    await set(ref(db,'academy'),state);
+    setSyncStatus('ok','✅ تم الحفظ');
+    btn.innerHTML='✅';
+    setTimeout(()=>{btn.innerHTML='☁️ حفظ';btn.disabled=false;},2000);
+  } catch(e){
+    setSyncStatus('err','⚠️ فشل');
+    btn.innerHTML='☁️ حفظ';btn.disabled=false;
+  }
 }
 window.saveAll=saveAll;
 
-window.setRatingGroup=function(g,btn){ratingGroup=g;document.querySelectorAll('[id^="rg-"]').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderPlayerCards();};
-window.setAttGroup=function(g,btn){attGroup=g;document.querySelectorAll('#att-record .day-pill').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderAttList();};
-window.filterSubGroup=function(g,btn){subGroupFilter=g;document.querySelectorAll('#sub-list .day-pill').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');renderSubList();};
+function renderAll(){
+  renderRatingAll();
+  renderSubList();
+  renderAttList();
+  renderAlerts();
+}
 
-const GROUP_LABEL={big:'🔵 الكبار',mid:'🟡 الوسط',small:'🟢 الصغار',all:'الكل'};
+// ===== NAVIGATION =====
+window.switchMain=function(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='subscriptions'){renderSubList();renderAlerts();}
+  if(id==='attendance'){renderAttList();}
+};
+window.switchSub=function(id,btn){
+  document.querySelectorAll('#page-subscriptions .sub-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#page-subscriptions .sub-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sub-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='alerts')renderAlerts();
+};
+window.switchAtt=function(id,btn){
+  document.querySelectorAll('#page-attendance .sub-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#page-attendance .sub-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('att-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='stats'){renderAttStats();populateMonthFilter();}
+  if(id==='history')renderHistory();
+};
+window.switchTab=function(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='leaderboard')renderLeaderboard();
+  if(id==='rplayers'){renderRPlayersList();refreshPlayerDropdown();}
+};
 
+// ===== RATING =====
+function getWeekKey(o=0){
+  const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);
+  d.setDate(diff+o*7);
+  return d.toISOString().slice(0,10);
+}
+function currentWeekKey(){return getWeekKey(weekOffset);}
+function getWeekRatings(){
+  const k=currentWeekKey();
+  if(!state.weeks[k])state.weeks[k]={ratings:{}};
+  return state.weeks[k].ratings;
+}
+function getWeekLabel(){
+  const d=new Date(currentWeekKey()),e=new Date(d);
+  e.setDate(d.getDate()+6);
+  return d.toLocaleDateString('en-GB',{month:'short',day:'numeric'})+' — '+e.toLocaleDateString('en-GB',{month:'short',day:'numeric'});
+}
+window.changeWeek=function(d){weekOffset+=d;openCard=null;renderRatingAll();};
+window.setRatingGroup=function(g,btn){
+  ratingGroup=g;
+  document.querySelectorAll('.group-filter .day-pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderPlayerCards();
+};
+function getScore(pid,day){
+  const r=getWeekRatings()[pid]?.[day];
+  if(!r)return 0;
+  let t=Object.values(r.criteria||{}).reduce((a,b)=>a+b,0);
+  const p=state.ratingPlayers.find(x=>x.id===pid);
+  if(p)(BONUS[p.pos]||[]).forEach(b=>{t+=(r.bonus?.[b.id]||0)*b.pts;});
+  return t;
+}
+function getTotalScore(pid){return DAYS.reduce((s,_,i)=>s+getScore(pid,i),0);}
+
+function renderRatingAll(){
+  document.getElementById('weekLabel').textContent=getWeekLabel();
+  const wk=new Date(currentWeekKey());
+  const off=[6,0,1,2,3,4,5];
+  document.getElementById('dayPills').innerHTML=DAYS.map((d,i)=>{
+    const dd=new Date(wk);
+    dd.setDate(wk.getDate()+off[i]);
+    const ds=dd.toLocaleDateString('en-GB',{day:'numeric',month:'numeric'});
+    return`<button class="day-pill ${i===state.currentDay?'active':''}" onclick="selectDay(${i})" id="dp-${i}">${d}<br><span style="font-size:0.65rem;opacity:0.8">${ds}</span></button>`;
+  }).join('');
+  renderPlayerCards();
+  renderLeaderboard();
+  renderRPlayersList();
+}
+
+window.selectDay=function(i){
+  state.currentDay=i;
+  openCard=null;
+  renderPlayerCards();
+  document.querySelectorAll('[id^="dp-"]').forEach((b,idx)=>{
+    b.classList.toggle('active',idx===i);
+  });
+};
+
+function renderPlayerCards(){
+  const el=document.getElementById('playerCards');
+  let players=state.ratingPlayers;
+  if(ratingGroup!=='all')players=players.filter(p=>(p.group||'')===ratingGroup);
+  if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
+  const ratings=getWeekRatings();
+  el.innerHTML=players.map(p=>{
+    const ds=getScore(p.id,state.currentDay);
+    const r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{}};
+    const bonuses=BONUS[p.pos]||[];
+    const isOpen=openCard===p.id;
+    const cHTML=CRITERIA.map(c=>{
+      const btns=Array.from({length:c.max+1},(_,v)=>
+        `<button class="score-btn ${(r.criteria[c.id]||0)===v?'selected':''}" onclick="setScore('${p.id}','${c.id}',${v});event.stopPropagation()">${v}</button>`
+      ).join('');
+      return`<div class="criteria-row"><div class="criteria-label">${c.label}(/${c.max})</div><div class="score-btns">${btns}</div></div>`;
+    }).join('');
+    const bHTML=bonuses.length?`<div class="bonus-section"><div class="bonus-label">⭐ ${POS_LABEL[p.pos]}</div>${bonuses.map(b=>
+      `<div class="bonus-row"><div class="bonus-name">${b.label}(+${b.pts})</div><div class="counter-btns">
+      <button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',-1);event.stopPropagation()">−</button>
+      <div class="counter-val">${r.bonus?.[b.id]||0}</div>
+      <button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',1);event.stopPropagation()">+</button>
+      </div></div>`).join('')}</div>`:'';
+    return`<div class="player-card">
+      <div class="player-header" onclick="toggleCard('${p.id}')">
+        <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-total ${ds===0?'zero':''}" id="score-${p.id}">${ds}</div>
+        <div class="chevron ${isOpen?'open':''}">▼</div>
+      </div>
+      <div class="criteria-grid ${isOpen?'open':''}">${cHTML}${bHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleCard=function(id){openCard=openCard===id?null:id;renderPlayerCards();};
+
+function ensureRating(pid){
+  const wr=getWeekRatings();
+  if(!wr[pid])wr[pid]={};
+  if(!wr[pid][state.currentDay])wr[pid][state.currentDay]={criteria:{},bonus:{}};
+}
+
+window.setScore=function(pid,cid,val){
+  ensureRating(pid);
+  getWeekRatings()[pid][state.currentDay].criteria[cid]=val;
+  const s=getScore(pid,state.currentDay);
+  const el=document.getElementById('score-'+pid);
+  if(el){el.textContent=s;el.className='player-total'+(s===0?' zero':'');}
+  document.querySelectorAll(`[onclick*="setScore('${pid}','${cid}'"]`).forEach(b=>{
+    const v=parseInt(b.getAttribute('onclick').match(/,(\d+)\)/)[1]);
+    b.className='score-btn'+(val===v?' selected':'');
+  });
+};
+
+window.changeBonus=function(pid,bid,delta){
+  ensureRating(pid);
+  const cur=getWeekRatings()[pid][state.currentDay].bonus[bid]||0;
+  getWeekRatings()[pid][state.currentDay].bonus[bid]=Math.max(0,cur+delta);
+  const prev=openCard;openCard=pid;renderPlayerCards();openCard=prev;
+};
+
+function renderLeaderboard(){
+  const el=document.getElementById('leaderboardContent');
+  if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
+  const ws=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)})).sort((a,b)=>b.total-a.total);
+  const overall=renderBoard('🏆 أفضل لاعب',ws);
+  const byGroup=['big','mid','small'].map(g=>{
+    const f=ws.filter(p=>p.group===g);
+    return f.length?renderBoard(GROUP_LABEL[g]+' — الترتيب',f):'';
+  }).join('');
+  const byPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{
+    const f=ws.filter(p=>p.pos===pos);
+    return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]}`,f):'';
+  }).join('');
+  const ds=DAYS.map((day,di)=>{
+    const sc=ws.map(p=>({...p,score:getScore(p.id,di)})).sort((a,b)=>b.score-a.score);
+    const t=sc[0];
+    if(!t||t.score===0)return`<div class="board-row"><span style="color:var(--muted)">${day}: —</span></div>`;
+    return`<div class="board-row"><span style="color:var(--gold)">⭐</span><div class="board-name">${day}</div><div style="font-weight:700">${t.name}</div><div class="board-pts">${t.score}</div></div>`;
+  }).join('');
+  el.innerHTML=`${overall}${byGroup}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
+}
+
+function renderBoard(title,players){
+  if(!players.length)return'';
+  const medals=['🥇','🥈','🥉'];
+  const rows=players.slice(0,3).map((p,i)=>
+    `<div class="board-row">
+      <div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div>
+      <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
+      <div class="board-name">${p.name}</div>
+      <div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div>
+    </div>`
+  ).join('');
+  return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;
+}
+
+// Rating Players Management
 window.refreshPlayerDropdown=function(){
   const grpEl=document.getElementById('rAddGroup');
   const sel=document.getElementById('rSelectPlayer');
   if(!sel)return;
   const group=grpEl?grpEl.value:'all';
   const existing=state.ratingPlayers.map(p=>p.name);
-  const gl={big:'كبار',mid:'وسط',small:'صغار'};
   const avail=state.subPlayers.filter(p=>!existing.includes(p.name)&&(group==='all'||(p.group||'')===group));
-  sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+avail.map(p=>`<option value="${p.id}">${p.name}${p.group?' ('+gl[p.group]+')':''}</option>`).join('');
+  sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+
+    avail.map(p=>`<option value="${p.id}">${p.name}${p.group?' ('+GROUP_LABEL[p.group]+')':''}</option>`).join('');
 };
+
 window.addFromDropdown=function(){
   const selEl=document.getElementById('rSelectPlayer');
   const pos=document.getElementById('rNewPos').value;
@@ -387,109 +623,41 @@ window.addFromDropdown=function(){
   if(!sub)return;
   if(state.ratingPlayers.find(p=>p.name===sub.name)){alert('هذا اللاعب مضاف بالفعل');return;}
   state.ratingPlayers.push({id:Date.now().toString(),name:sub.name,pos,group:sub.group||'big'});
-  refreshPlayerDropdown();renderRPlayersList();renderPlayerCards();
-};
-function renderAll(){renderRatingAll();renderSubList();renderAttList();renderAlerts();renderAttStats();}
-
-window.switchMain=function(id,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');btn.classList.add('active');
-};
-window.switchSub=function(id,btn){
-  document.querySelectorAll('.sub-page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('sub-'+id).classList.add('active');btn.classList.add('active');
-  if(id==='alerts')renderAlerts();
-};
-window.switchAtt=function(id,btn){
-  document.querySelectorAll('#page-attendance .sub-page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('#page-attendance .sub-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('att-'+id).classList.add('active');btn.classList.add('active');
-  if(id==='stats'){renderAttStats();populateMonthFilter();}
-  if(id==='history')renderHistory();
+  refreshPlayerDropdown();
+  renderRPlayersList();
+  renderPlayerCards();
 };
 
-// ===== RATING =====
-function getWeekKey(o=0){const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);d.setDate(diff+o*7);return d.toISOString().slice(0,10);}
-function currentWeekKey(){return getWeekKey(weekOffset);}
-function getWeekRatings(){const k=currentWeekKey();if(!state.weeks[k])state.weeks[k]={ratings:{}};return state.weeks[k].ratings;}
-function getWeekLabel(){const d=new Date(currentWeekKey()),e=new Date(d);e.setDate(d.getDate()+6);return d.toLocaleDateString('en-GB',{month:'short',day:'numeric'})+' — '+e.toLocaleDateString('en-GB',{month:'short',day:'numeric'});}
-window.changeWeek=function(d){weekOffset+=d;openCard=null;renderRatingAll();};
-function getScore(pid,day){const r=getWeekRatings()[pid]?.[day];if(!r)return 0;let t=Object.values(r.criteria||{}).reduce((a,b)=>a+b,0);const p=state.ratingPlayers.find(x=>x.id===pid);if(p)(BONUS[p.pos]||[]).forEach(b=>{t+=(r.bonus?.[b.id]||0)*b.pts;});return t;}
-function getTotalScore(pid){return DAYS.reduce((s,_,i)=>s+getScore(pid,i),0);}
-function renderRatingAll(){
-  document.getElementById('weekLabel').textContent=getWeekLabel();
-  document.getElementById('dayPills').innerHTML=DAYS.map((d,i)=>{const wk=new Date(currentWeekKey());const off=[6,0,1,2,3,4,5];const dd=new Date(wk);dd.setDate(wk.getDate()+off[i]);const ds=dd.toLocaleDateString('en-GB',{day:'numeric',month:'numeric'});return`<button class="day-pill ${i===state.currentDay?'active':''}" onclick="selectDay(${i})">${d}<br><span style="font-size:0.65rem;opacity:0.8">${ds}</span></button>`;}).join('');
-  renderPlayerCards();renderLeaderboard();renderRPlayersList();
+function renderRPlayersList(){
+  const el=document.getElementById('rPlayersList');
+  if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في قائمة التقييم</p>';return;}
+  const gc={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
+  el.innerHTML=state.ratingPlayers.map(p=>
+    `<div class="board-row">
+      <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
+      <div class="board-name">${p.name}<br>
+        <span style="font-size:0.7rem;color:${gc[p.group]||'var(--muted)'}">
+          ${GROUP_LABEL[p.group]||'لم تُحدد'}
+        </span>
+      </div>
+      <button class="btn btn-blue btn-sm" onclick="editRPlayer('${p.id}')">✏️</button>
+      <button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">🗑️</button>
+    </div>`
+  ).join('');
 }
-window.selectDay=function(i){state.currentDay=i;openCard=null;renderPlayerCards();document.querySelectorAll('#dayPills .day-pill').forEach((b,idx)=>b.className='day-pill'+(idx===i?' active':''));};
-function renderPlayerCards(){
-  const el=document.getElementById('playerCards');
-  if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">أضف لاعبين من تبويب "اللاعبون"</p>';return;}
-  const ratings=getWeekRatings();
-  let filteredPlayers=state.ratingPlayers;
-  if(ratingGroup!=='all') filteredPlayers=filteredPlayers.filter(p=>(p.group||'')===ratingGroup);
-  if(!filteredPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
-  el.innerHTML=filteredPlayers.map(p=>{
-    const ds=getScore(p.id,state.currentDay),r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{}},bonuses=BONUS[p.pos]||[],isOpen=openCard===p.id;
-    const cHTML=CRITERIA.map(c=>{const btns=Array.from({length:c.max+1},(_,v)=>`<button class="score-btn ${(r.criteria[c.id]||0)===v?'selected':''}" onclick="setScore('${p.id}','${c.id}',${v});event.stopPropagation()">${v}</button>`).join('');return`<div class="criteria-row"><div class="criteria-label">${c.label}(/${c.max})</div><div class="score-btns">${btns}</div></div>`;}).join('');
-    const bHTML=bonuses.length?`<div class="bonus-section"><div class="bonus-label">⭐ ${POS_LABEL[p.pos]}</div>${bonuses.map(b=>`<div class="bonus-row"><div class="bonus-name">${b.label}(+${b.pts})</div><div class="counter-btns"><button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',-1);event.stopPropagation()">−</button><div class="counter-val">${r.bonus?.[b.id]||0}</div><button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',1);event.stopPropagation()">+</button></div></div>`).join('')}</div>`:'';
-    return`<div class="player-card"><div class="player-header" onclick="toggleCard('${p.id}')"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="player-name">${p.name}</div><div class="player-total ${ds===0?'zero':''}" id="score-${p.id}">${ds}</div><div class="chevron ${isOpen?'open':''}">▼</div></div><div class="criteria-grid ${isOpen?'open':''}">${cHTML}${bHTML}</div></div>`;
-  }).join('');
-}
-window.toggleCard=function(id){openCard=openCard===id?null:id;renderPlayerCards();};
-function ensureRating(pid){const wr=getWeekRatings();if(!wr[pid])wr[pid]={};if(!wr[pid][state.currentDay])wr[pid][state.currentDay]={criteria:{},bonus:{}};}
-window.setScore=function(pid,cid,val){ensureRating(pid);getWeekRatings()[pid][state.currentDay].criteria[cid]=val;const s=getScore(pid,state.currentDay);const el=document.getElementById('score-'+pid);if(el){el.textContent=s;el.className='player-total'+(s===0?' zero':'');}document.querySelectorAll(`[onclick*="setScore('${pid}','${cid}'"]`).forEach(b=>{const v=parseInt(b.getAttribute('onclick').match(/,(\d+)\)/)[1]);b.className='score-btn'+(val===v?' selected':'');});};
-window.changeBonus=function(pid,bid,delta){ensureRating(pid);const cur=getWeekRatings()[pid][state.currentDay].bonus[bid]||0;getWeekRatings()[pid][state.currentDay].bonus[bid]=Math.max(0,cur+delta);const prev=openCard;openCard=pid;renderPlayerCards();openCard=prev;};
-function renderLeaderboard(){
-  const el=document.getElementById('leaderboardContent');
-  if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
-  const ws=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)})).sort((a,b)=>b.total-a.total);
-  const overall=renderBoard('🏆 أفضل لاعب',ws);
-  const byPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{const f=ws.filter(p=>p.pos===pos);return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]}`,f):'';}).join('');
-  const byGroup=['big','mid','small'].map(g=>{const f=ws.filter(p=>p.group===g);return f.length?renderBoard(`${GROUP_LABEL[g]} — الترتيب`,f):'';}).join('');
-  const ds=DAYS.map((day,di)=>{const sc=ws.map(p=>({...p,score:getScore(p.id,di)})).sort((a,b)=>b.score-a.score);const t=sc[0];if(!t||t.score===0)return`<div class="board-row"><span style="color:var(--muted)">${day}: —</span></div>`;return`<div class="board-row"><span style="color:var(--gold)">⭐</span><div class="board-name">${day}</div><div style="font-weight:700">${t.name}</div><div class="board-pts">${t.score}</div></div>`;}).join('');
-  el.innerHTML=`${overall}${byGroup}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
-}
-function renderBoard(title,players){if(!players.length)return'';const medals=['🥇','🥈','🥉'];const rows=players.slice(0,3).map((p,i)=>`<div class="board-row"><div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}</div><div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div></div>`).join('');return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;}
-window.addRatingPlayer=function(){};
-window.renderSubPlayersToAdd=function(){
-  const group=document.getElementById('rAddGroup').value;
-  const sel=document.getElementById('rSelectPlayer');
-  const existing=state.ratingPlayers.map(p=>p.name);
-  const available=state.subPlayers.filter(p=>{
-    const notAdded=!existing.includes(p.name);
-    const groupMatch=group==='all'||(p.group||'')=== group;
-    return notAdded&&groupMatch;
-  });
-  const groupLabel={big:'🔵 كبار',mid:'🟡 وسط',small:'🟢 صغار'};
-  sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+available.map(p=>`<option value="${p.id}">${p.name}${p.group?' ('+( groupLabel[p.group]||'')+')'  :''}</option>`).join('');
-};
-window.addRatingPlayerFromSub=function(){
-  const selId=document.getElementById('rSelectPlayer').value;
-  const pos=document.getElementById('rNewPos').value;
-  if(!selId){alert('اختر لاعباً أولاً');return;}
-  const subP=state.subPlayers.find(p=>p.id===selId);
-  if(!subP)return;
-  if(state.ratingPlayers.find(p=>p.name===subP.name)){alert('هذا اللاعب موجود بالفعل');return;}
-  state.ratingPlayers.push({id:Date.now().toString(),name:subP.name,pos,group:subP.group||'big'});
-  renderSubPlayersToAdd();renderRPlayersList();renderPlayerCards();
-};
-function renderRPlayersList(){const el=document.getElementById('rPlayersList');if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}const groupColors={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
-  el.innerHTML=state.ratingPlayers.map(p=>`<div class="board-row"><div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div><div class="board-name">${p.name}<br><span style="font-size:0.7rem;color:${groupColors[p.group]||'var(--muted)'}">${GROUP_LABEL[p.group||'']||'لم تُحدد'}</span></div><button class="btn btn-blue btn-sm" onclick="editRPlayer('${p.id}')" style="margin-left:0.3rem">✏️</button><button class="btn btn-red btn-sm" onclick="removeRPlayer('${p.id}')">🗑️</button></div>`).join('');}
+
 window.editRPlayer=function(id){
   const p=state.ratingPlayers.find(x=>x.id===id);if(!p)return;
-  showModal('✏️ تعديل بيانات اللاعب','',`
-    <label>الاسم</label><input id="editRName" value="${p.name}" style="margin-bottom:0.5rem"/>
+  showModal('✏️ تعديل اللاعب','',`
+    <label>الاسم</label><input id="editRName" value="${p.name}"/>
     <label>المجموعة</label>
-    <select id="editRGroup" style="margin-bottom:0.5rem">
+    <select id="editRGroup">
       <option value="big" ${(p.group||'')==='big'?'selected':''}>🔵 الكبار</option>
       <option value="mid" ${(p.group||'')==='mid'?'selected':''}>🟡 الوسط</option>
       <option value="small" ${(p.group||'')==='small'?'selected':''}>🟢 الصغار</option>
     </select>
     <label>المركز</label>
-    <select id="editRPos" style="margin-bottom:0.5rem">
+    <select id="editRPos">
       <option value="fwd" ${p.pos==='fwd'?'selected':''}>⚡ مهاجم</option>
       <option value="rw" ${p.pos==='rw'?'selected':''}>↗️ جناح أيمن</option>
       <option value="lw" ${p.pos==='lw'?'selected':''}>↖️ جناح أيسر</option>
@@ -509,9 +677,24 @@ window.editRPlayer=function(id){
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
-window.removeRPlayer=function(id){showModal('حذف لاعب','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});renderRPlayersList();renderPlayerCards();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
-window.confirmResetWeek=function(){showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[{label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
-window.switchTab=function(id,btn){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');btn.classList.add('active');if(id==='leaderboard')renderLeaderboard();if(id==='rplayers'){renderRPlayersList();refreshPlayerDropdown();}};
+
+window.removeRPlayer=function(id){
+  showModal('حذف لاعب','هل تريد حذف هذا اللاعب من قائمة التقييم؟','',[
+    {label:'حذف',cls:'btn-red',action:()=>{
+      state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==id);
+      Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[id];});
+      renderRPlayersList();renderPlayerCards();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
+window.confirmResetWeek=function(){
+  showModal('تأكيد','حذف تقييمات الأسبوع الحالي؟','',[
+    {label:'حذف',cls:'btn-red',action:()=>{delete state.weeks[currentWeekKey()];closeModal();renderRatingAll();}},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
 
 // ===== SUBSCRIPTIONS =====
 window.autoSetEndDate=function(){
@@ -520,24 +703,33 @@ window.autoSetEndDate=function(){
   const d=new Date(start);d.setMonth(d.getMonth()+1);
   document.getElementById('sEnd').value=d.toISOString().slice(0,10);
 };
+
 function getSubStatus(p){
   if(p.stopped)return 'stopped';
   if(!p.endDate)return 'active';
-  const end=new Date(p.endDate),now=new Date();
-  const diff=(end-now)/(1000*60*60*24);
+  const diff=(new Date(p.endDate)-new Date())/(1000*60*60*24);
   if(diff<0)return 'expired';
   if(diff<=10)return 'expiring';
   return 'active';
 }
-const SUB_LABEL={active:'✅ فعال',expired:'❌ منتهي',stopped:'⏸ موقوف',expiring:'⚠️ ينتهي قريباً'};
-const SUB_CLASS={active:'sub-active',expired:'sub-expired',stopped:'sub-stopped',expiring:'sub-expiring'};
+
 window.filterSub=function(f){subFilter=f;renderSubList();};
+window.filterSubGroup=function(g,btn){
+  subGroupFilter=g;
+  document.querySelectorAll('#sub-list .filter-row:last-of-type .day-pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderSubList();
+};
+
 window.renderSubList=function(){
   const el=document.getElementById('subList');
-  const search=document.getElementById('subSearch').value.toLowerCase();
+  const search=(document.getElementById('subSearch').value||'').toLowerCase();
   let players=[...state.subPlayers];
   if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
-  if(subFilter!=='all')players=players.filter(p=>{const s=getSubStatus(p);return s===subFilter||(subFilter==='active'&&s==='expiring');});
+  if(subFilter!=='all')players=players.filter(p=>{
+    const s=getSubStatus(p);
+    return s===subFilter||(subFilter==='active'&&s==='expiring');
+  });
   if(subGroupFilter!=='all')players=players.filter(p=>(p.group||'')===subGroupFilter);
   if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
   el.innerHTML=players.map(p=>{
@@ -545,19 +737,31 @@ window.renderSubList=function(){
     return`<div class="player-sub-card">
       <div class="player-sub-header" onclick="toggleSubCard('${p.id}')">
         <div class="jersey">${p.jersey||'—'}</div>
-        <div class="player-sub-name">${p.name}<br><span style="font-size:0.7rem;color:var(--muted)">${p.birthYear?'م'+p.birthYear:''} ${p.group?'• '+GROUP_LABEL[p.group]:''}</span></div>
+        <div class="player-sub-name">${p.name}<br>
+          <span style="font-size:0.7rem;color:var(--muted)">
+            ${p.birthYear?'م'+p.birthYear:''}
+            ${p.group?' • '+GROUP_LABEL[p.group]:''}
+          </span>
+        </div>
         <span class="sub-badge ${SUB_CLASS[status]}">${SUB_LABEL[status]}</span>
         <div class="chevron" id="chevron-${p.id}">▼</div>
       </div>
       <div class="player-sub-body" id="subbody-${p.id}">
         <div class="info-row"><span class="info-label">بداية الاشتراك</span><span class="info-val">${p.startDate||'—'}</span></div>
-        <div class="info-row"><span class="info-label">نهاية الاشتراك</span><span class="info-val" style="color:${status==='expired'?'var(--red)':status==='expiring'?'var(--gold)':'var(--text)'}">${p.endDate||'—'}</span></div>
+        <div class="info-row"><span class="info-label">نهاية الاشتراك</span>
+          <span class="info-val" style="color:${status==='expired'?'var(--red)':status==='expiring'?'var(--gold)':'var(--text)'}">
+            ${p.endDate||'—'}
+          </span>
+        </div>
         ${p.stopDate?`<div class="info-row"><span class="info-label">تاريخ الإيقاف</span><span class="info-val" style="color:#ff6d00">${p.stopDate}</span></div>`:''}
         ${p.resumeDate?`<div class="info-row"><span class="info-label">تاريخ الاستكمال</span><span class="info-val" style="color:var(--green)">${p.resumeDate}</span></div>`:''}
         <div class="sub-actions">
           <button class="btn btn-green btn-sm" onclick="renewSub('${p.id}')">🔄 تجديد</button>
-          ${p.stopped?`<button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="showResumeSub('${p.id}')">▶️ استكمال</button>`:`<button class="btn btn-orange btn-sm" onclick="showStopSub('${p.id}')">⏸ إيقاف</button>`}
-          <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="addCompDays('${p.id}')">➕ تعويض</button>
+          ${p.stopped?
+            `<button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="showResumeSub('${p.id}')">▶️ استكمال</button>`:
+            `<button class="btn btn-orange btn-sm" onclick="showStopSub('${p.id}')">⏸ إيقاف</button>`
+          }
+          <button class="btn btn-purple btn-sm" onclick="addCompDays('${p.id}')">➕ تعويض</button>
           <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️</button>
         </div>
@@ -565,84 +769,139 @@ window.renderSubList=function(){
     </div>`;
   }).join('');
 };
-window.toggleSubCard=function(id){const body=document.getElementById('subbody-'+id),chev=document.getElementById('chevron-'+id);body.classList.toggle('open');chev.classList.toggle('open');};
+
+window.toggleSubCard=function(id){
+  const body=document.getElementById('subbody-'+id);
+  const chev=document.getElementById('chevron-'+id);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+};
+
 window.addSubPlayer=function(){
-  const name=document.getElementById('sName').value.trim();if(!name)return;
-  const p={id:Date.now().toString(),name,group:document.getElementById('sGroup').value,birthYear:document.getElementById('sBirth').value,jersey:document.getElementById('sJersey').value,startDate:document.getElementById('sStart').value,endDate:document.getElementById('sEnd').value,stopped:false};
+  const name=document.getElementById('sName').value.trim();
+  if(!name)return;
+  const p={
+    id:Date.now().toString(),name,
+    group:document.getElementById('sGroup').value,
+    birthYear:document.getElementById('sBirth').value,
+    jersey:document.getElementById('sJersey').value,
+    startDate:document.getElementById('sStart').value,
+    endDate:document.getElementById('sEnd').value,
+    stopped:false
+  };
   state.subPlayers.push(p);
   ['sName','sBirth','sJersey','sStart','sEnd'].forEach(id=>document.getElementById(id).value='');
   showModal('✅ تم','تم تسجيل اللاعب بنجاح','',[{label:'حسناً',cls:'btn-green',action:closeModal}]);
   renderSubList();
 };
+
 window.renewSub=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
-  showModal('🔄 تجديد الاشتراك','',`<label>تاريخ الانتهاء الجديد</label><input type="date" id="renewDate" value="${p.endDate||''}"/>`,[
-    {label:'تجديد',cls:'btn-green',action:()=>{const v=document.getElementById('renewDate').value;if(v){p.endDate=v;p.stopped=false;renderSubList();}closeModal();}},
+  showModal('🔄 تجديد الاشتراك','',`
+    <label>تاريخ الانتهاء الجديد</label>
+    <input type="date" id="renewDate" value="${p.endDate||''}"/>
+  `,[
+    {label:'تجديد',cls:'btn-green',action:()=>{
+      const v=document.getElementById('renewDate').value;
+      if(v){p.endDate=v;p.stopped=false;}
+      renderSubList();closeModal();
+    }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
+
 window.showStopSub=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   const today=new Date().toISOString().slice(0,10);
-  showModal('⏸ إيقاف الاشتراك','',`<label>تاريخ الإيقاف</label><input type="date" id="stopDate" value="${today}"/>`,[
+  showModal('⏸ إيقاف الاشتراك','',`
+    <label>تاريخ الإيقاف</label>
+    <input type="date" id="stopDate" value="${today}"/>
+  `,[
     {label:'إيقاف',cls:'btn-orange',action:()=>{
       const stopDate=document.getElementById('stopDate').value;
-      if(stopDate){p.stopped=true;p.stopDate=stopDate;renderSubList();}closeModal();
+      if(stopDate){p.stopped=true;p.stopDate=stopDate;}
+      renderSubList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
+
 window.showResumeSub=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   const today=new Date().toISOString().slice(0,10);
-  // حساب تاريخ الانتهاء الجديد تلقائياً بناءً على فترة الإيقاف
   let autoNewEnd='';
   if(p.stopDate&&p.endDate){
-    const stopD=new Date(p.stopDate),resumeD=new Date(today);
-    const pauseDays=Math.ceil((resumeD-stopD)/(1000*60*60*24));
-    const oldEnd=new Date(p.endDate);oldEnd.setDate(oldEnd.getDate()+pauseDays);
+    const pauseDays=Math.ceil((new Date(today)-new Date(p.stopDate))/(1000*60*60*24));
+    const oldEnd=new Date(p.endDate);
+    oldEnd.setDate(oldEnd.getDate()+pauseDays);
     autoNewEnd=oldEnd.toISOString().slice(0,10);
   }
   showModal('▶️ استكمال الاشتراك','',`
-    <label>تاريخ الاستكمال</label><input type="date" id="resumeDate" value="${today}" oninput="recalcEndDate('${p.stopDate||''}','${p.endDate||''}')"/>
-    <label style="margin-top:0.5rem">تاريخ الانتهاء الجديد (يُحسب تلقائياً)</label>
+    <label>تاريخ الاستكمال</label>
+    <input type="date" id="resumeDate" value="${today}" oninput="recalcResume('${p.stopDate||''}','${p.endDate||''}')"/>
+    <label>تاريخ الانتهاء الجديد (يُحسب تلقائياً)</label>
     <input type="date" id="newEndDate" value="${autoNewEnd||p.endDate||''}" style="color:var(--gold)"/>
-    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">⚡ يُحسب تلقائياً بإضافة فترة الإيقاف</div>
+    <div style="font-size:0.73rem;color:var(--muted);margin-top:0.3rem">⚡ يضاف وقت الإيقاف تلقائياً</div>
   `,[
     {label:'استكمال',cls:'btn-green',action:()=>{
       const resumeDate=document.getElementById('resumeDate').value;
-      const newEndDate=document.getElementById('newEndDate').value;
+      const newEnd=document.getElementById('newEndDate').value;
       if(resumeDate){
-        p.endDate=newEndDate||p.endDate;
-        p.stopped=false;p.resumeDate=resumeDate;renderSubList();
-      }closeModal();
+        p.stopped=false;p.resumeDate=resumeDate;
+        if(newEnd)p.endDate=newEnd;
+      }
+      renderSubList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
-window.recalcEndDate=function(stopDate,oldEnd){
+window.recalcResume=function(stopDate,oldEnd){
   const resumeVal=document.getElementById('resumeDate').value;
   if(stopDate&&oldEnd&&resumeVal){
-    const stopD=new Date(stopDate),resumeD=new Date(resumeVal);
-    const pauseDays=Math.ceil((resumeD-stopD)/(1000*60*60*24));
-    const endD=new Date(oldEnd);endD.setDate(endD.getDate()+pauseDays);
+    const pauseDays=Math.ceil((new Date(resumeVal)-new Date(stopDate))/(1000*60*60*24));
+    const endD=new Date(oldEnd);
+    endD.setDate(endD.getDate()+pauseDays);
     document.getElementById('newEndDate').value=endD.toISOString().slice(0,10);
   }
 };
+
+window.addCompDays=function(id){
+  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  showModal('➕ أيام تعويضية','',`
+    <label>عدد الأيام</label>
+    <input type="number" id="compDays" value="1" min="1" max="30"/>
+    <label>تاريخ الانتهاء الحالي</label>
+    <input type="date" value="${p.endDate||''}" disabled style="opacity:0.6"/>
+  `,[
+    {label:'إضافة',cls:'btn-green',action:()=>{
+      const days=parseInt(document.getElementById('compDays').value)||0;
+      if(days>0&&p.endDate){
+        const d=new Date(p.endDate);
+        d.setDate(d.getDate()+days);
+        p.endDate=d.toISOString().slice(0,10);
+      }
+      renderSubList();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
 window.editSubPlayer=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   showModal('✏️ تعديل بيانات اللاعب','',`
-    <label>الاسم</label><input id="editSName" value="${p.name}" style="margin-bottom:0.5rem"/>
+    <label>الاسم</label><input id="editSName" value="${p.name}"/>
     <label>المجموعة</label>
-    <select id="editSGroup" style="margin-bottom:0.5rem">
+    <select id="editSGroup">
       <option value="big" ${(p.group||'')==='big'?'selected':''}>🔵 الكبار</option>
       <option value="mid" ${(p.group||'')==='mid'?'selected':''}>🟡 الوسط</option>
       <option value="small" ${(p.group||'')==='small'?'selected':''}>🟢 الصغار</option>
     </select>
-    <label>سنة الميلاد</label><input id="editSBirth" value="${p.birthYear||''}" type="number" style="margin-bottom:0.5rem"/>
-    <label>رقم التيشيرت</label><input id="editSJersey" value="${p.jersey||''}" type="number" style="margin-bottom:0.5rem"/>
-    <label>تاريخ بداية الاشتراك</label><input id="editSStart" type="date" value="${p.startDate||''}" style="margin-bottom:0.5rem" oninput="autoEditEndDate()"/>
-    <label>تاريخ الانتهاء (يُحسب تلقائياً)</label><input id="editSEnd" type="date" value="${p.endDate||''}"/>
+    <label>سنة الميلاد</label><input id="editSBirth" value="${p.birthYear||''}" type="number"/>
+    <label>رقم التيشيرت</label><input id="editSJersey" value="${p.jersey||''}" type="number"/>
+    <label>تاريخ الاشتراك</label>
+    <input id="editSStart" type="date" value="${p.startDate||''}" oninput="autoEditEnd()"/>
+    <label>تاريخ الانتهاء</label>
+    <input id="editSEnd" type="date" value="${p.endDate||''}"/>
   `,[
     {label:'حفظ',cls:'btn-green',action:()=>{
       p.name=document.getElementById('editSName').value.trim()||p.name;
@@ -656,47 +915,35 @@ window.editSubPlayer=function(id){
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
-window.autoEditEndDate=function(){
-  const start=document.getElementById('editSStart').value;
-  if(!start)return;
-  const d=new Date(start);d.setMonth(d.getMonth()+1);
+window.autoEditEnd=function(){
+  const s=document.getElementById('editSStart').value;
+  if(!s)return;
+  const d=new Date(s);d.setMonth(d.getMonth()+1);
   document.getElementById('editSEnd').value=d.toISOString().slice(0,10);
 };
-window.addCompDays=function(id){
-  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
-  showModal('➕ إضافة أيام تعويضية','',`
-    <label>عدد الأيام المراد إضافتها</label>
-    <input type="number" id="compDays" value="1" min="1" max="30" style="margin-bottom:0.5rem"/>
-    <label>تاريخ الانتهاء الحالي</label>
-    <input type="date" id="compCurrentEnd" value="${p.endDate||''}" disabled style="opacity:0.6;margin-bottom:0.5rem"/>
-    <label>تاريخ الانتهاء الجديد</label>
-    <input type="date" id="compNewEnd" value="${p.endDate||''}" style="color:var(--gold)"/>
-    <div style="font-size:0.75rem;color:var(--muted);margin-top:0.3rem">⚡ أدخل عدد الأيام وسيُحسب التاريخ تلقائياً</div>
-  `,[
-    {label:'إضافة',cls:'btn-green',action:()=>{
-      const days=parseInt(document.getElementById('compDays').value)||0;
-      if(days>0&&p.endDate){
-        const d=new Date(p.endDate);d.setDate(d.getDate()+days);
-        p.endDate=d.toISOString().slice(0,10);
-        renderSubList();
-      }closeModal();
+
+window.deleteSubPlayer=function(id){
+  showModal('حذف','هل تريد حذف هذا اللاعب نهائياً؟','',[
+    {label:'حذف',cls:'btn-red',action:()=>{
+      state.subPlayers=state.subPlayers.filter(p=>p.id!==id);
+      renderSubList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
-  setTimeout(()=>{
-    const inp=document.getElementById('compDays');
-    if(inp) inp.oninput=function(){
-      const days=parseInt(this.value)||0;
-      const cur=document.getElementById('compCurrentEnd').value;
-      if(cur&&days>0){const d=new Date(cur);d.setDate(d.getDate()+days);document.getElementById('compNewEnd').value=d.toISOString().slice(0,10);}
-    };
-  },100);
 };
-window.deleteSubPlayer=function(id){showModal('حذف','هل تريد حذف هذا اللاعب؟','',[{label:'حذف',cls:'btn-red',action:()=>{state.subPlayers=state.subPlayers.filter(p=>p.id!==id);renderSubList();closeModal();}},{label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}]);};
+
 function renderAlerts(){
-  const el=document.getElementById('alertsList');const now=new Date();
-  const expiring=state.subPlayers.filter(p=>{if(p.stopped||!p.endDate)return false;const diff=(new Date(p.endDate)-now)/(1000*60*60*24);return diff>=0&&diff<=10;});
-  const expired=state.subPlayers.filter(p=>{if(p.stopped||!p.endDate)return false;return new Date(p.endDate)<now;});
+  const el=document.getElementById('alertsList');
+  const now=new Date();
+  const expiring=state.subPlayers.filter(p=>{
+    if(p.stopped||!p.endDate)return false;
+    const diff=(new Date(p.endDate)-now)/(1000*60*60*24);
+    return diff>=0&&diff<=10;
+  });
+  const expired=state.subPlayers.filter(p=>{
+    if(p.stopped||!p.endDate)return false;
+    return new Date(p.endDate)<now;
+  });
   let html='';
   if(expiring.length)html+=`<div class="section"><div class="section-title" style="color:var(--gold)">⚠️ تنتهي خلال 10 أيام (${expiring.length})</div>${expiring.map(p=>`<div class="board-row"><div class="jersey">${p.jersey||'—'}</div><div class="board-name">${p.name}</div><span style="color:var(--gold);font-size:0.78rem">${p.endDate}</span></div>`).join('')}</div>`;
   if(expired.length)html+=`<div class="section"><div class="section-title" style="color:var(--red)">❌ منتهية (${expired.length})</div>${expired.map(p=>`<div class="board-row"><div class="jersey">${p.jersey||'—'}</div><div class="board-name">${p.name}</div><span style="color:var(--red);font-size:0.78rem">${p.endDate}</span></div>`).join('')}</div>`;
@@ -705,24 +952,50 @@ function renderAlerts(){
 }
 
 // ===== ATTENDANCE =====
-window.setAttToday=function(){document.getElementById('attDate').value=new Date().toISOString().slice(0,10);renderAttList();};
+function getAllPlayers(){
+  const all=[...state.ratingPlayers];
+  state.subPlayers.forEach(p=>{if(!all.find(r=>r.name===p.name))all.push({...p});});
+  return all;
+}
+
+window.setAttToday=function(){
+  document.getElementById('attDate').value=new Date().toISOString().slice(0,10);
+  renderAttList();
+};
+window.setAttGroup=function(g,btn){
+  attGroup=g;
+  document.querySelectorAll('#att-record .filter-row .day-pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderAttList();
+};
+
 window.renderAttList=function(){
-  const el=document.getElementById('attList'),sumEl=document.getElementById('attDaySummary');
+  const el=document.getElementById('attList');
+  const sumEl=document.getElementById('attDaySummary');
   const date=document.getElementById('attDate').value;
   if(!date){el.innerHTML='<p class="empty-msg">اختر تاريخاً أولاً</p>';sumEl.innerHTML='';return;}
   let allPlayers=getAllPlayers();
-  if(attGroup!=='all') allPlayers=allPlayers.filter(p=>(p.group||'')===attGroup);
-  if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
+  if(attGroup!=='all')allPlayers=allPlayers.filter(p=>(p.group||'')===attGroup);
+  if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
   if(!state.attendance[date])state.attendance[date]={};
   const present=allPlayers.filter(p=>state.attendance[date][p.id]==='present').length;
   const absent=allPlayers.filter(p=>state.attendance[date][p.id]==='absent').length;
-  const dayName=getDayName(date);
   sumEl.innerHTML=`<div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
-    <div style="flex:1;background:#00c85322;border:1px solid #00c85344;border-radius:8px;padding:0.5rem;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:var(--green)">${present}</div><div style="font-size:0.72rem;color:var(--muted)">حاضر</div></div>
-    <div style="flex:1;background:#ff174422;border:1px solid #ff174433;border-radius:8px;padding:0.5rem;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:var(--red)">${absent}</div><div style="font-size:0.72rem;color:var(--muted)">غائب</div></div>
-    <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.5rem;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:var(--gold)">${allPlayers.length-present-absent}</div><div style="font-size:0.72rem;color:var(--muted)">لم يُسجَّل</div></div>
-  </div><div style="font-size:0.78rem;color:var(--muted);text-align:center;margin-bottom:0.5rem">${dayName} — ${date}</div>`;
-  el.innerHTML='<div>'+allPlayers.map(p=>{
+    <div style="flex:1;background:#00c85322;border:1px solid #00c85344;border-radius:8px;padding:0.5rem;text-align:center">
+      <div style="font-size:1.3rem;font-weight:900;color:var(--green)">${present}</div>
+      <div style="font-size:0.72rem;color:var(--muted)">حاضر</div>
+    </div>
+    <div style="flex:1;background:#ff174422;border:1px solid #ff174433;border-radius:8px;padding:0.5rem;text-align:center">
+      <div style="font-size:1.3rem;font-weight:900;color:var(--red)">${absent}</div>
+      <div style="font-size:0.72rem;color:var(--muted)">غائب</div>
+    </div>
+    <div style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.5rem;text-align:center">
+      <div style="font-size:1.3rem;font-weight:900;color:var(--gold)">${allPlayers.length-present-absent}</div>
+      <div style="font-size:0.72rem;color:var(--muted)">لم يُسجَّل</div>
+    </div>
+  </div>
+  <div style="font-size:0.78rem;color:var(--muted);text-align:center;margin-bottom:0.5rem">${getDayName(date)} — ${date}</div>`;
+  el.innerHTML=allPlayers.map(p=>{
     const att=state.attendance[date][p.id]||'';
     return`<div class="att-row">
       <div class="att-name">${p.name}</div>
@@ -731,33 +1004,29 @@ window.renderAttList=function(){
         <button class="att-btn ${att==='absent'?'absent':''}" onclick="setAtt('${date}','${p.id}','absent')">❌</button>
       </div>
     </div>`;
-  }).join('')+'</div>';
+  }).join('');
 };
+
 window.setAtt=function(date,pid,val){
   if(!state.attendance[date])state.attendance[date]={};
   state.attendance[date][pid]=state.attendance[date][pid]===val?'':val;
   renderAttList();
 };
-function getAllPlayers(){
-  const all=[...state.ratingPlayers];
-  state.subPlayers.forEach(p=>{if(!all.find(r=>r.name===p.name))all.push({...p,id:p.id});});
-  return all;
-}
+
 function renderHistory(){
   const el=document.getElementById('historyContent');
   const from=document.getElementById('histFrom').value;
   const to=document.getElementById('histTo').value;
   const dates=Object.keys(state.attendance).filter(d=>(!from||d>=from)&&(!to||d<=to)).sort().reverse();
   if(!dates.length){el.innerHTML='<p class="empty-msg">لا توجد بيانات في هذه الفترة</p>';return;}
+  const allP=getAllPlayers();
   el.innerHTML=dates.map(date=>{
-    const allP=getAllPlayers();
     const att=state.attendance[date]||{};
     const present=allP.filter(p=>att[p.id]==='present');
     const absent=allP.filter(p=>att[p.id]==='absent');
-    const dayName=getDayName(date);
     return`<div class="section" style="margin-bottom:0.65rem">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
-        <div style="font-weight:800;font-size:0.88rem">${dayName} — ${date}</div>
+        <div style="font-weight:800;font-size:0.88rem">${getDayName(date)} — ${date}</div>
         <div style="display:flex;gap:0.35rem;align-items:center">
           <span style="color:var(--green);font-size:0.8rem;font-weight:700">✅${present.length}</span>
           <span style="color:var(--red);font-size:0.8rem;font-weight:700">❌${absent.length}</span>
@@ -769,49 +1038,55 @@ function renderHistory(){
     </div>`;
   }).join('');
 }
+
 window.deleteAttDay=function(date){
-  showModal('🗑️ حذف سجل الحضور',`هل تريد حذف سجل يوم ${date}؟`,'',[
-    {label:'حذف',cls:'btn-red',action:()=>{
-      delete state.attendance[date];
-      renderHistory();
-      closeModal();
-    }},
+  showModal('🗑️ حذف سجل',`حذف سجل يوم ${date}؟`,'',[
+    {label:'حذف',cls:'btn-red',action:()=>{delete state.attendance[date];renderHistory();closeModal();}},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
 };
+
 function populateMonthFilter(){
   const sel=document.getElementById('attMonth');
   const months=[...new Set(Object.keys(state.attendance).map(d=>d.slice(0,7)))].sort().reverse();
   sel.innerHTML='<option value="">كل الوقت</option>'+months.map(m=>`<option value="${m}">${m}</option>`).join('');
 }
+
 window.renderAttStats=function(){
   const el=document.getElementById('attStats');
-  const search=document.getElementById('attSearch').value.toLowerCase();
+  const search=(document.getElementById('attSearch').value||'').toLowerCase();
   const month=document.getElementById('attMonth').value;
-  const allP=getAllPlayers();
-  let players=allP;
+  let players=getAllPlayers();
   if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
   const dates=Object.keys(state.attendance).filter(d=>!month||d.startsWith(month));
   const totalDays=dates.length;
   if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
-  const withStats=players.map(p=>{
+  const ws=players.map(p=>{
     let present=0,absent=0;
-    dates.forEach(d=>{if(state.attendance[d]?.[p.id]==='present')present++;else if(state.attendance[d]?.[p.id]==='absent')absent++;});
+    dates.forEach(d=>{
+      if(state.attendance[d]?.[p.id]==='present')present++;
+      else if(state.attendance[d]?.[p.id]==='absent')absent++;
+    });
     return{...p,present,absent,pct:totalDays?Math.round(present/totalDays*100):0};
   }).sort((a,b)=>b.pct-a.pct);
-  const avgPct=withStats.length?Math.round(withStats.reduce((s,p)=>s+p.pct,0)/withStats.length):0;
+  const avg=ws.length?Math.round(ws.reduce((s,p)=>s+p.pct,0)/ws.length):0;
   el.innerHTML=`<div class="stats-grid">
-    <div class="stat-card"><div class="stat-num">${totalDays}</div><div class="stat-label">أيام تدريب</div></div>
-    <div class="stat-card"><div class="stat-num gold">${avgPct}%</div><div class="stat-label">متوسط الحضور</div></div>
-    <div class="stat-card"><div class="stat-num">${players.length}</div><div class="stat-label">لاعب</div></div>
-  </div>`+withStats.map(p=>{
-    const barW=p.pct;const barColor=p.pct>=80?'var(--green)':p.pct>=50?'var(--gold)':'var(--red)';
+    <div class="stat-card"><div class="stat-num">${totalDays}</div><div style="font-size:0.7rem;color:var(--muted)">أيام تدريب</div></div>
+    <div class="stat-card"><div class="stat-num gold">${avg}%</div><div style="font-size:0.7rem;color:var(--muted)">متوسط الحضور</div></div>
+    <div class="stat-card"><div class="stat-num">${players.length}</div><div style="font-size:0.7rem;color:var(--muted)">لاعب</div></div>
+  </div>`+ws.map(p=>{
+    const c=p.pct>=80?'var(--green)':p.pct>=50?'var(--gold)':'var(--red)';
     return`<div class="att-summary-row">
       <div style="flex:1">
         <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.3rem">${p.name}</div>
-        <div style="background:var(--card2);border-radius:4px;height:6px;overflow:hidden"><div style="width:${barW}%;height:100%;background:${barColor};border-radius:4px"></div></div>
+        <div style="background:var(--card2);border-radius:4px;height:6px;overflow:hidden">
+          <div style="width:${p.pct}%;height:100%;background:${c};border-radius:4px"></div>
+        </div>
       </div>
-      <div style="text-align:center;min-width:40px"><div style="font-weight:900;color:${barColor};font-size:0.9rem">${p.pct}%</div><div style="font-size:0.68rem;color:var(--muted)">${p.present}✅ ${p.absent}❌</div></div>
+      <div style="text-align:center;min-width:40px">
+        <div style="font-weight:900;color:${c};font-size:0.9rem">${p.pct}%</div>
+        <div style="font-size:0.68rem;color:var(--muted)">${p.present}✅ ${p.absent}❌</div>
+      </div>
     </div>`;
   }).join('');
 };
@@ -822,14 +1097,16 @@ window.showModal=function(title,msg,bodyHTML,btns){
   const msgEl=document.getElementById('modalMsg');
   if(msg){msgEl.style.display='block';msgEl.textContent=msg;}else{msgEl.style.display='none';}
   document.getElementById('modalBody').innerHTML=bodyHTML||'';
-  document.getElementById('modalBtns').innerHTML=btns.map((b,i)=>`<button class="btn ${b.cls}" onclick="modalAction(${i})">${b.label}</button>`).join('');
+  document.getElementById('modalBtns').innerHTML=btns.map((b,i)=>
+    `<button class="btn ${b.cls}" onclick="modalAction(${i})">${b.label}</button>`
+  ).join('');
   document.getElementById('modalOverlay').classList.add('open');
   window._modalActions=btns.map(b=>b.action);
 };
 window.modalAction=function(i){window._modalActions[i]();};
 window.closeModal=function(){document.getElementById('modalOverlay').classList.remove('open');};
 
-// INIT
+// ===== INIT =====
 document.getElementById('attDate').value=new Date().toISOString().slice(0,10);
 loadAll();
 </script>
