@@ -755,7 +755,7 @@ window.renderSubList=function(){
         </div>
         ${p.stopDate?`<div class="info-row"><span class="info-label">تاريخ الإيقاف</span><span class="info-val" style="color:#ff6d00">${p.stopDate}</span></div>`:''}
         ${p.resumeDate?`<div class="info-row"><span class="info-label">تاريخ الاستكمال</span><span class="info-val" style="color:var(--green)">${p.resumeDate}</span></div>`:''}
-        ${(p.compDaysTotal&&p.compDaysTotal>0)?`<div class="info-row"><span class="info-label">أيام التعويض المضافة</span><span class="info-val" style="color:#ce93d8">+${p.compDaysTotal} يوم</span></div>`:''}
+        ${(p.compDaysTotal&&p.compDaysTotal>0)?`<div class="info-row"><span class="info-label">➕ أيام تعويض مضافة</span><span class="info-val" style="color:#ce93d8">+${p.compDaysTotal} يوم</span></div>`:''}
         <div class="sub-actions">
           <button class="btn btn-green btn-sm" onclick="renewSub('${p.id}')">🔄 تجديد</button>
           ${p.stopped?
@@ -869,19 +869,30 @@ window.recalcResume=function(stopDate,oldEnd){
 window.addCompDays=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   showModal('➕ أيام تعويضية','',`
-    <label>عدد الأيام التعويضية</label>
-    <input type="number" id="compDays" value="1" min="1" max="30"/>
+    <label>العملية</label>
+    <select id="compAction" style="margin-bottom:0.5rem">
+      <option value="add">➕ إضافة أيام تعويضية</option>
+      <option value="remove">➖ إلغاء أيام تعويضية</option>
+    </select>
+    <label>عدد الأيام</label>
+    <input type="number" id="compDays" value="1" min="1" max="365" style="margin-bottom:0.5rem"/>
     <label>تاريخ الانتهاء الحالي</label>
-    <input type="date" value="${p.endDate||''}" disabled style="opacity:0.6"/>
-    <div style="font-size:0.73rem;color:#ce93d8;margin-top:0.3rem">إجمالي أيام التعويض السابقة: ${p.compDaysTotal||0} يوم</div>
+    <input type="date" value="${p.endDate||''}" disabled style="opacity:0.6;margin-bottom:0.35rem"/>
+    <div style="font-size:0.73rem;color:#ce93d8">إجمالي أيام التعويض: ${p.compDaysTotal||0} يوم</div>
   `,[
-    {label:'إضافة',cls:'btn-green',action:()=>{
+    {label:'تأكيد',cls:'btn-green',action:()=>{
       const days=parseInt(document.getElementById('compDays').value)||0;
+      const action=document.getElementById('compAction').value;
       if(days>0&&p.endDate){
         const d=new Date(p.endDate);
-        d.setDate(d.getDate()+days);
+        if(action==='add'){
+          d.setDate(d.getDate()+days);
+          p.compDaysTotal=(p.compDaysTotal||0)+days;
+        } else {
+          d.setDate(d.getDate()-days);
+          p.compDaysTotal=Math.max(0,(p.compDaysTotal||0)-days);
+        }
         p.endDate=d.toISOString().slice(0,10);
-        p.compDaysTotal=(p.compDaysTotal||0)+days;
       }
       renderSubList();closeModal();
     }},
