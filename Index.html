@@ -339,16 +339,29 @@ const CRITERIA=[
   {id:'spirit',label:'🔥 الروح',max:1},
   {id:'improvement',label:'📈 التحسن',max:1}
 ];
-const BONUS={
-  gk:[{id:'saves',label:'تصدٍّ',pts:1},{id:'clean',label:'صفرية',pts:2}],
-  def:[{id:'tackle',label:'قطع',pts:1},{id:'block',label:'صد',pts:1}],
-  rb:[{id:'tackle',label:'قطع',pts:1},{id:'block',label:'صد',pts:1}],
-  lb:[{id:'tackle',label:'قطع',pts:1},{id:'block',label:'صد',pts:1}],
-  mid:[{id:'assist',label:'تمريرة حاسمة',pts:1},{id:'recovery',label:'استرجاع',pts:1}],
-  fwd:[{id:'goal',label:'هدف',pts:2},{id:'assist',label:'تمريرة',pts:1}],
-  rw:[{id:'goal',label:'هدف',pts:2},{id:'assist',label:'تمريرة',pts:1}],
-  lw:[{id:'goal',label:'هدف',pts:2},{id:'assist',label:'تمريرة',pts:1}]
-};
+// نقاط إضافية عامة تُتاح لكل اللاعبين بغض النظر عن مركزهم (أي لاعب ممكن يسجل هدف أو يعمل تمريرة حاسمة)
+const BONUS_COMMON=[
+  {id:'goal',label:'⚽ هدف',pts:2},
+  {id:'assist',label:'🎯 تمريرة حاسمة',pts:1},
+  {id:'tackle',label:'🛡️ قطع/استرجاع',pts:1},
+  {id:'block',label:'🚫 صد/تصدٍّ',pts:1}
+];
+// نقاط إضافية خاصة بمركز الحارس فقط (فوق النقاط العامة)
+const BONUS_GK=[
+  {id:'saves',label:'🧤 تصدٍّ',pts:1},
+  {id:'clean',label:'🔒 شباك نظيفة',pts:2}
+];
+function getBonusList(pos){
+  return pos==='gk'?[...BONUS_COMMON,...BONUS_GK]:BONUS_COMMON;
+}
+// سلوك اللاعب في الملعب — تُسجَّل بضغطة وحدة وتؤثر تلقائياً على نقاط الروح/التعاون
+const BEHAVIORS=[
+  {id:'badword',label:'🤬 لفظ غير لائق',effect:-1,color:'var(--red)'},
+  {id:'aggressive',label:'😡 عصبية مع زميل',effect:-1,color:'var(--red)'},
+  {id:'refuse',label:'🚫 رفض تنفيذ تعليمات',effect:-1,color:'var(--orange)'},
+  {id:'unsporting',label:'👎 سلوك غير رياضي',effect:-1,color:'var(--orange)'},
+  {id:'excellent',label:'👍 سلوك ممتاز',effect:1,color:'var(--green)'}
+];
 const POS_LABEL={gk:'حارس',def:'مدافع',rb:'مدافع أيمن',lb:'مدافع أيسر',mid:'وسط',fwd:'مهاجم',rw:'جناح أيمن',lw:'جناح أيسر'};
 const POS_EMOJI={gk:'🧤',def:'🛡️',rb:'🛡️',lb:'🛡️',mid:'🔄',fwd:'⚡',rw:'↗️',lw:'↖️'};
 const GROUP_LABEL={big:'🔵 الكبار',mid:'🟡 الوسط',small:'🟢 الصغار'};
@@ -476,10 +489,85 @@ function getScore(pid,day){
   if(!r)return 0;
   let t=Object.values(r.criteria||{}).reduce((a,b)=>a+b,0);
   const p=state.ratingPlayers.find(x=>x.id===pid);
-  if(p)(BONUS[p.pos]||[]).forEach(b=>{t+=(r.bonus?.[b.id]||0)*b.pts;});
+  if(p)getBonusList(p.pos).forEach(b=>{t+=(r.bonus?.[b.id]||0)*b.pts;});
+  // تأثير ملاحظات السلوك على نقاط اليوم
+  (r.behaviors||[]).forEach(bid=>{
+    const beh=BEHAVIORS.find(b=>b.id===bid);
+    if(beh)t+=beh.effect;
+  });
   return t;
 }
 function getTotalScore(pid){return DAYS.reduce((s,_,i)=>s+getScore(pid,i),0);}
+
+// إرجاع كل مفاتيح الأسابيع (weekKey) التي تقع ضمن الشهر الحالي المعروض (بناءً على الأسبوع المختار حالياً)
+function getMonthWeekKeys(){
+  const cur=new Date(currentWeekKey());
+  const month=cur.getMonth(), year=cur.getFullYear();
+  return Object.keys(state.weeks).filter(k=>{
+    const d=new Date(k);
+    return d.getMonth()===month&&d.getFullYear()===year;
+  });
+}
+
+// مجموع نقاط لاعب معين خلال الشهر الحالي (كل الأسابيع المندرجة تحته)
+function getMonthScore(pid){
+  const keys=getMonthWeekKeys();
+  let total=0;
+  keys.forEach(k=>{
+    const ratings=state.weeks[k]?.ratings||{};
+    const p=state.ratingPlayers.find(x=>x.id===pid);
+    DAYS.forEach((_,day)=>{
+      const r=ratings[pid]?.[day];
+      if(!r)return;
+      total+=Object.values(r.criteria||{}).reduce((a,b)=>a+b,0);
+      if(p)getBonusList(p.pos).forEach(b=>{total+=(r.bonus?.[b.id]||0)*b.pts;});
+      (r.behaviors||[]).forEach(bid=>{
+        const beh=BEHAVIORS.find(b=>b.id===bid);
+        if(beh)total+=beh.effect;
+      });
+    });
+  });
+  return total;
+}
+
+// عدد الملاحظات السلبية على مدار فترة معينة (لحل التعادل — الأقل ملاحظات سلبية يتقدم)
+function getNegativeBehaviorCount(pid,weekKeys){
+  let count=0;
+  weekKeys.forEach(k=>{
+    const ratings=state.weeks[k]?.ratings||{};
+    DAYS.forEach((_,day)=>{
+      const r=ratings[pid]?.[day];
+      if(!r||!r.behaviors)return;
+      r.behaviors.forEach(bid=>{
+        const beh=BEHAVIORS.find(b=>b.id===bid);
+        if(beh&&beh.effect<0)count++;
+      });
+    });
+  });
+  return count;
+}
+
+// معدل حضور لاعب خلال فترة معينة (من سجل الحضور والغياب الفعلي) — نسبة مئوية
+function getAttendancePct(pid,fromDate,toDate){
+  const dates=Object.keys(state.attendance).filter(d=>d>=fromDate&&d<=toDate);
+  if(!dates.length)return 0;
+  let present=0;
+  dates.forEach(d=>{if(state.attendance[d]?.[pid]==='present')present++;});
+  return dates.length?present/dates.length:0;
+}
+
+// ترتيب قائمة لاعبين بحسب: 1) النقاط 2) نسبة الحضور 3) الأقل ملاحظات سلبية
+function rankPlayers(players,weekKeys,fromDate,toDate){
+  return players.map(p=>({
+    ...p,
+    attPct:getAttendancePct(p.id,fromDate,toDate),
+    negCount:getNegativeBehaviorCount(p.id,weekKeys)
+  })).sort((a,b)=>{
+    if(b.total!==a.total)return b.total-a.total;
+    if(b.attPct!==a.attPct)return b.attPct-a.attPct;
+    return a.negCount-b.negCount;
+  });
+}
 
 function renderRatingAll(){
   document.getElementById('weekLabel').textContent=getWeekLabel();
@@ -513,8 +601,8 @@ function renderPlayerCards(){
   const ratings=getWeekRatings();
   el.innerHTML=players.map(p=>{
     const ds=getScore(p.id,state.currentDay);
-    const r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{}};
-    const bonuses=BONUS[p.pos]||[];
+    const r=ratings[p.id]?.[state.currentDay]||{criteria:{},bonus:{},behaviors:[]};
+    const bonuses=getBonusList(p.pos);
     const isOpen=openCard===p.id;
     const cHTML=CRITERIA.map(c=>{
       const btns=Array.from({length:c.max+1},(_,v)=>
@@ -522,30 +610,65 @@ function renderPlayerCards(){
       ).join('');
       return`<div class="criteria-row"><div class="criteria-label">${c.label}(/${c.max})</div><div class="score-btns">${btns}</div></div>`;
     }).join('');
-    const bHTML=bonuses.length?`<div class="bonus-section"><div class="bonus-label">⭐ ${POS_LABEL[p.pos]}</div>${bonuses.map(b=>
+    const bHTML=bonuses.length?`<div class="bonus-section"><div class="bonus-label">⭐ نقاط إضافية</div>${bonuses.map(b=>
       `<div class="bonus-row"><div class="bonus-name">${b.label}(+${b.pts})</div><div class="counter-btns">
       <button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',-1);event.stopPropagation()">−</button>
       <div class="counter-val">${r.bonus?.[b.id]||0}</div>
       <button class="counter-btn" onclick="changeBonus('${p.id}','${b.id}',1);event.stopPropagation()">+</button>
       </div></div>`).join('')}</div>`:'';
+    const activeBehaviors=(r.behaviors||[]);
+    const behBadges=activeBehaviors.length?`<div style="display:flex;gap:0.25rem;flex-wrap:wrap;margin-top:0.35rem">${activeBehaviors.map(bid=>{
+      const beh=BEHAVIORS.find(b=>b.id===bid);
+      return beh?`<span style="font-size:0.68rem;padding:0.15rem 0.4rem;border-radius:10px;background:${beh.color}22;color:${beh.color};border:1px solid ${beh.color}44">${beh.label}</span>`:'';
+    }).join('')}</div>`:'';
     return`<div class="player-card">
       <div class="player-header" onclick="toggleCard('${p.id}')">
         <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
         <div class="player-name">${p.name}<br><span style="font-size:0.7rem;color:var(--muted)">${POS_LABEL[p.pos]||''}</span></div>
+        <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="openBehaviorModal('${p.id}');event.stopPropagation()">🚩</button>
         <div class="player-total ${ds===0?'zero':''}" id="score-${p.id}">${ds}</div>
         <div class="chevron ${isOpen?'open':''}">▼</div>
       </div>
+      ${behBadges?`<div style="padding:0 0.85rem 0.5rem">${behBadges}</div>`:''}
       <div class="criteria-grid ${isOpen?'open':''}">${cHTML}${bHTML}</div>
     </div>`;
   }).join('');
 }
+
+// ===== سلوك اللاعب (ملاحظات سريعة) =====
+window.openBehaviorModal=function(pid){
+  const p=state.ratingPlayers.find(x=>x.id===pid);if(!p)return;
+  ensureRating(pid);
+  const r=getWeekRatings()[pid][state.currentDay];
+  if(!r.behaviors)r.behaviors=[];
+  const btnsHTML=BEHAVIORS.map(b=>{
+    const active=r.behaviors.includes(b.id);
+    return `<button class="btn btn-sm" style="background:${active?b.color:'var(--card2)'};color:${active?'#000':'var(--text)'};border:1px solid ${b.color}55;width:100%;margin-bottom:0.4rem;text-align:right" onclick="toggleBehavior('${pid}','${b.id}')">${b.label} ${active?'✓':''}</button>`;
+  }).join('');
+  showModal(`🚩 سلوك: ${p.name}`,'اضغط لتسجيل الملاحظة (يمكن اختيار أكثر من واحدة)',`<div id="behaviorBtns">${btnsHTML}</div>`,[
+    {label:'تم',cls:'btn-green',action:closeModal}
+  ]);
+};
+
+window.toggleBehavior=function(pid,bid){
+  ensureRating(pid);
+  const r=getWeekRatings()[pid][state.currentDay];
+  if(!r.behaviors)r.behaviors=[];
+  const idx=r.behaviors.indexOf(bid);
+  if(idx>-1)r.behaviors.splice(idx,1);else r.behaviors.push(bid);
+  openBehaviorModal(pid);
+  const s=getScore(pid,state.currentDay);
+  const el=document.getElementById('score-'+pid);
+  if(el){el.textContent=s;el.className='player-total'+(s===0?' zero':'');}
+};
 
 window.toggleCard=function(id){openCard=openCard===id?null:id;renderPlayerCards();};
 
 function ensureRating(pid){
   const wr=getWeekRatings();
   if(!wr[pid])wr[pid]={};
-  if(!wr[pid][state.currentDay])wr[pid][state.currentDay]={criteria:{},bonus:{}};
+  if(!wr[pid][state.currentDay])wr[pid][state.currentDay]={criteria:{},bonus:{},behaviors:[]};
+  if(!wr[pid][state.currentDay].behaviors)wr[pid][state.currentDay].behaviors=[];
 }
 
 window.setScore=function(pid,cid,val){
@@ -570,15 +693,20 @@ window.changeBonus=function(pid,bid,delta){
 function renderLeaderboard(){
   const el=document.getElementById('leaderboardContent');
   if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
-  const ws=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)})).sort((a,b)=>b.total-a.total);
-  const overall=renderBoard('🏆 أفضل لاعب',ws);
+
+  // ===== الترتيب الأسبوعي =====
+  const wkKey=currentWeekKey();
+  const wkStart=wkKey, wkEnd=new Date(new Date(wkKey).getTime()+6*86400000).toISOString().slice(0,10);
+  const wsRaw=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)}));
+  const ws=rankPlayers(wsRaw,[wkKey],wkStart,wkEnd);
+  const overall=renderBoard('🏆 أفضل لاعب — هذا الأسبوع',ws);
   const byGroup=['big','mid','small'].map(g=>{
     const f=ws.filter(p=>p.group===g);
-    return f.length?renderBoard(GROUP_LABEL[g]+' — الترتيب',f):'';
+    return f.length?renderBoard(GROUP_LABEL[g]+' — الترتيب الأسبوعي',f):'';
   }).join('');
   const byPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{
     const f=ws.filter(p=>p.pos===pos);
-    return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]}`,f):'';
+    return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]} — الأسبوع`,f):'';
   }).join('');
   const ds=DAYS.map((day,di)=>{
     const sc=ws.map(p=>({...p,score:getScore(p.id,di)})).sort((a,b)=>b.score-a.score);
@@ -586,21 +714,44 @@ function renderLeaderboard(){
     if(!t||t.score===0)return`<div class="board-row"><span style="color:var(--muted)">${day}: —</span></div>`;
     return`<div class="board-row"><span style="color:var(--gold)">⭐</span><div class="board-name">${day}</div><div style="font-weight:700">${t.name}</div><div class="board-pts">${t.score}</div></div>`;
   }).join('');
-  el.innerHTML=`${overall}${byGroup}${byPos}<div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
+
+  // ===== الترتيب الشهري =====
+  const monthKeys=getMonthWeekKeys();
+  const curMonthDate=new Date(currentWeekKey());
+  const mStart=new Date(curMonthDate.getFullYear(),curMonthDate.getMonth(),1).toISOString().slice(0,10);
+  const mEnd=new Date(curMonthDate.getFullYear(),curMonthDate.getMonth()+1,0).toISOString().slice(0,10);
+  const monthName=curMonthDate.toLocaleDateString('ar-EG',{month:'long',year:'numeric'});
+  const msRaw=state.ratingPlayers.map(p=>({...p,total:getMonthScore(p.id)}));
+  const ms=rankPlayers(msRaw,monthKeys,mStart,mEnd);
+  const monthOverall=renderBoard(`👑 أفضل لاعب — شهر ${monthName}`,ms);
+  const monthByPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{
+    const f=ms.filter(p=>p.pos===pos);
+    return f.length?renderBoard(`${POS_EMOJI[pos]} أفضل ${POS_LABEL[pos]} — الشهر`,f):'';
+  }).join('');
+
+  el.innerHTML=`
+    <div class="board-section"><div class="board-title" style="color:var(--gold);font-size:0.9rem">📅 ${monthName}</div></div>
+    ${monthOverall}${monthByPos}
+    <div style="border-top:1px solid var(--border);margin:1rem 0"></div>
+    ${overall}${byGroup}${byPos}
+    <div class="board-section"><div class="board-title">⭐ نجوم الأيام</div>${ds}</div>`;
 }
 
 function renderBoard(title,players){
   if(!players.length)return'';
   const medals=['🥇','🥈','🥉'];
+  // كشف حالة التعادل الكامل بين أول لاعبين (نفس النقاط + نفس نسبة الحضور + نفس عدد الملاحظات)
+  const tieAtTop=players.length>1&&players[0].total===players[1].total&&players[0].attPct===players[1].attPct&&players[0].negCount===players[1].negCount;
   const rows=players.slice(0,3).map((p,i)=>
     `<div class="board-row">
-      <div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}</div>
+      <div class="rank ${['rank-1','rank-2','rank-3'][i]||'rank-n'}">${medals[i]||i+1}${tieAtTop&&i<2?'🤝':''}</div>
       <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
       <div class="board-name">${p.name}</div>
       <div class="board-pts ${i===0?'top':''}">${p.total} نقطة</div>
     </div>`
   ).join('');
-  return`<div class="board-section"><div class="board-title">${title}</div>${rows}</div>`;
+  const tieNote=tieAtTop?`<div style="font-size:0.68rem;color:var(--gold);padding:0.2rem 0.3rem">🤝 تعادل كامل — يشترك اللاعبان بالمركز الأول</div>`:'';
+  return`<div class="board-section"><div class="board-title">${title}</div>${rows}${tieNote}</div>`;
 }
 
 // Rating Players Management
