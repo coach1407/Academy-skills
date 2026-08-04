@@ -276,6 +276,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="sub-tab active" onclick="switchAtt('record',this)">📝 تسجيل</button>
     <button class="sub-tab" onclick="switchAtt('history',this)">📅 السجل</button>
     <button class="sub-tab" onclick="switchAtt('stats',this)">📊 إحصائيات</button>
+    <button class="sub-tab" onclick="switchAtt('visitors',this)">🔵 الزوار</button>
   </div>
   <div class="sub-page active" id="att-record">
     <div style="display:flex;gap:0.5rem;margin-bottom:0.6rem;align-items:center;">
@@ -308,6 +309,22 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
       </select>
     </div>
     <div id="attStats"></div>
+  </div>
+  <div class="sub-page" id="att-visitors">
+    <div class="section">
+      <div class="section-title">🔵 تسجيل زائر جديد</div>
+      <p style="color:var(--muted);font-size:0.75rem;margin-bottom:0.6rem;line-height:1.5">
+        للأولاد اللي يحضرون يوم أو يومين بدون اشتراك. تسجيلهم هنا لا يؤثر على إحصائيات الحضور أو التقييم الأسبوعي.
+      </p>
+      <div class="form-grid">
+        <div class="form-full"><label>اسم الزائر *</label><input id="vName" placeholder="الاسم الكامل"/></div>
+        <div><label>تاريخ الزيارة</label><input id="vDate" type="date"/></div>
+        <div><label>ملاحظة (اختياري)</label><input id="vNote" placeholder="مثال: رقم تواصل"/></div>
+      </div>
+      <button class="btn btn-green" onclick="addVisitor()" style="width:100%;margin-top:0.5rem">➕ تسجيل الزيارة</button>
+    </div>
+    <div class="search-box"><input id="visitorSearch" placeholder="🔍 بحث عن زائر..." oninput="renderVisitorsList()"/></div>
+    <div id="visitorsList"></div>
   </div>
 </div>
 
@@ -369,7 +386,7 @@ const SUB_LABEL={active:'✅ فعال',expired:'❌ منتهي',stopped:'⏸ م�
 const SUB_CLASS={active:'sub-active',expired:'sub-expired',stopped:'sub-stopped',expiring:'sub-expiring'};
 
 // ===== STATE =====
-let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},currentDay:0};
+let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},visitors:[],currentDay:0};
 let weekOffset=0, openCard=null, subFilter='all', subGroupFilter='all', ratingGroup='all', attGroup='all';
 
 // ===== HELPERS =====
@@ -394,6 +411,7 @@ async function loadAll(){
       if(d.weeks)state.weeks=d.weeks;
       if(d.subPlayers)state.subPlayers=d.subPlayers;
       if(d.attendance)state.attendance=d.attendance;
+      if(d.visitors)state.visitors=d.visitors;
       setSyncStatus('ok','✅ متصل بالسحابة');
     } else {
       setSyncStatus('ok','✅ جاهز');
@@ -450,6 +468,10 @@ window.switchAtt=function(id,btn){
   btn.classList.add('active');
   if(id==='stats'){renderAttStats();populateMonthFilter();}
   if(id==='history')renderHistory();
+  if(id==='visitors'){
+    document.getElementById('vDate').value=document.getElementById('vDate').value||new Date().toISOString().slice(0,10);
+    renderVisitorsList();
+  }
 };
 window.switchTab=function(id,btn){
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
@@ -1287,6 +1309,46 @@ window.renderAttStats=function(){
       </div>
     </div>`;
   }).join('');
+};
+
+// ===== الزوار (حضور تجريبي بدون اشتراك) =====
+window.addVisitor=function(){
+  const name=document.getElementById('vName').value.trim();
+  const date=document.getElementById('vDate').value||new Date().toISOString().slice(0,10);
+  const note=document.getElementById('vNote').value.trim();
+  if(!name){alert('اكتب اسم الزائر أولاً');return;}
+  state.visitors.push({id:Date.now().toString(),name,date,note});
+  document.getElementById('vName').value='';
+  document.getElementById('vNote').value='';
+  renderVisitorsList();
+};
+
+window.deleteVisitor=function(id){
+  showModal('حذف زائر','هل تريد حذف سجل هذا الزائر؟','',[
+    {label:'حذف',cls:'btn-red',action:()=>{
+      state.visitors=state.visitors.filter(v=>v.id!==id);
+      renderVisitorsList();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
+window.renderVisitorsList=function(){
+  const el=document.getElementById('visitorsList');
+  if(!el)return;
+  const search=(document.getElementById('visitorSearch').value||'').toLowerCase();
+  let visitors=[...(state.visitors||[])].sort((a,b)=>b.date.localeCompare(a.date));
+  if(search)visitors=visitors.filter(v=>v.name.toLowerCase().includes(search));
+  if(!visitors.length){el.innerHTML='<p class="empty-msg">لا يوجد زوار مسجلون</p>';return;}
+  el.innerHTML=visitors.map(v=>
+    `<div class="board-row">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:0.85rem">${v.name}</div>
+        <div style="font-size:0.7rem;color:var(--muted)">${getDayName(v.date)} — ${v.date}${v.note?' • '+v.note:''}</div>
+      </div>
+      <button class="btn btn-red btn-sm" onclick="deleteVisitor('${v.id}')">🗑️</button>
+    </div>`
+  ).join('');
 };
 
 // ===== MODAL =====
