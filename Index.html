@@ -230,6 +230,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="sub-tab active" onclick="switchSub('list',this)">📋 اللاعبون</button>
     <button class="sub-tab" onclick="switchSub('add',this)">➕ إضافة</button>
     <button class="sub-tab" onclick="switchSub('alerts',this)">🔔 تنبيهات</button>
+    <button class="sub-tab" onclick="switchSub('former',this)">⏮ السابقون</button>
   </div>
   <div class="sub-page active" id="sub-list">
     <div class="search-box"><input id="subSearch" placeholder="🔍 بحث..." oninput="renderSubList()"/></div>
@@ -267,6 +268,13 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     </div>
   </div>
   <div class="sub-page" id="sub-alerts"><div id="alertsList"></div></div>
+  <div class="sub-page" id="sub-former">
+    <p style="color:var(--muted);font-size:0.75rem;margin-bottom:0.7rem;line-height:1.5">
+      اللاعبون اللي تم نقلهم يدوياً (انتهى اشتراكهم من فترة أو ما رغبوا بالاستمرار). بياناتهم وسجل حضورهم محفوظ، وتقدر تسترجعهم كلاعبين حاليين في أي وقت.
+    </p>
+    <div class="search-box"><input id="formerSearch" placeholder="🔍 بحث..." oninput="renderFormerList()"/></div>
+    <div id="formerList"></div>
+  </div>
 </div>
 
 <!-- ===== ATTENDANCE ===== -->
@@ -460,6 +468,7 @@ window.switchSub=function(id,btn){
   document.getElementById('sub-'+id).classList.add('active');
   btn.classList.add('active');
   if(id==='alerts')renderAlerts();
+  if(id==='former')renderFormerList();
 };
 window.switchAtt=function(id,btn){
   document.querySelectorAll('#page-attendance .sub-page').forEach(p=>p.classList.remove('active'));
@@ -783,7 +792,7 @@ window.refreshPlayerDropdown=function(){
   if(!sel)return;
   const group=grpEl?grpEl.value:'all';
   const existing=state.ratingPlayers.map(p=>p.name);
-  const avail=state.subPlayers.filter(p=>!existing.includes(p.name)&&(group==='all'||(p.group||'')===group));
+  const avail=state.subPlayers.filter(p=>!p.former&&!existing.includes(p.name)&&(group==='all'||(p.group||'')===group));
   sel.innerHTML='<option value="">-- اختر لاعباً --</option>'+
     avail.map(p=>`<option value="${p.id}">${p.name}${p.group?' ('+GROUP_LABEL[p.group]+')':''}</option>`).join('');
 };
@@ -897,7 +906,7 @@ window.filterSubGroup=function(g,btn){
 window.renderSubList=function(){
   const el=document.getElementById('subList');
   const search=(document.getElementById('subSearch').value||'').toLowerCase();
-  let players=[...state.subPlayers];
+  let players=state.subPlayers.filter(p=>!p.former);
   if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
   if(subFilter!=='all')players=players.filter(p=>{
     const s=getSubStatus(p);
@@ -937,6 +946,8 @@ window.renderSubList=function(){
           }
           <button class="btn btn-purple btn-sm" onclick="addCompDays('${p.id}')">➕ تعويض</button>
           <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
+          <button class="btn btn-sm" style="background:#2979ff22;color:#42a5f5;border:1px solid #2979ff33" onclick="showPlayerAttendanceHistory('${p.id}','${p.name}')">📅 سجل الحضور</button>
+          <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="showTransferFormer('${p.id}')">⏮ نقل للسابقين</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️</button>
         </div>
       </div>
@@ -1143,13 +1154,118 @@ window.autoEditEnd=function(){
 };
 
 window.deleteSubPlayer=function(id){
-  showModal('حذف','هل تريد حذف هذا اللاعب نهائياً؟','',[
+  showModal('حذف','هل تريد حذف هذا اللاعب نهائياً؟ سيتم حذف بياناته بشكل كامل ولا يمكن التراجع.','',[
     {label:'حذف',cls:'btn-red',action:()=>{
       state.subPlayers=state.subPlayers.filter(p=>p.id!==id);
-      renderSubList();closeModal();
+      renderSubList();renderFormerList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
+};
+
+// ===== نقل لاعب لقائمة السابقين (يدوياً) =====
+window.showTransferFormer=function(id){
+  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  const today=new Date().toISOString().slice(0,10);
+  showModal('⏮ نقل للاعبين السابقين','',`
+    <label>سبب النقل</label>
+    <select id="formerReason">
+      <option value="expired">انتهى الاشتراك ولم يجدد</option>
+      <option value="left">لم يرغب بالاستمرار</option>
+      <option value="other">أخرى</option>
+    </select>
+    <label>تاريخ النقل</label>
+    <input type="date" id="formerDate" value="${today}"/>
+  `,[
+    {label:'⏮ نقل',cls:'btn-purple',action:()=>{
+      p.former=true;
+      p.formerDate=document.getElementById('formerDate').value||today;
+      p.formerReason=document.getElementById('formerReason').value;
+      renderSubList();renderFormerList();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
+// ===== استرجاع لاعب سابق كلاعب حالي =====
+window.restoreFromFormer=function(id){
+  const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  showModal('↩️ استرجاع اللاعب',`هل تريد إرجاع "${p.name}" لقائمة اللاعبين الحاليين؟`,'',[
+    {label:'استرجاع',cls:'btn-green',action:()=>{
+      p.former=false;
+      renderSubList();renderFormerList();closeModal();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
+// ===== عرض قائمة اللاعبين السابقين =====
+window.renderFormerList=function(){
+  const el=document.getElementById('formerList');
+  if(!el)return;
+  const search=(document.getElementById('formerSearch').value||'').toLowerCase();
+  let players=state.subPlayers.filter(p=>p.former);
+  if(search)players=players.filter(p=>p.name.toLowerCase().includes(search));
+  players.sort((a,b)=>(b.formerDate||'').localeCompare(a.formerDate||''));
+  if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون سابقون</p>';return;}
+  const reasonLabel={expired:'انتهى الاشتراك ولم يجدد',left:'لم يرغب بالاستمرار',other:'أخرى'};
+  el.innerHTML=players.map(p=>`
+    <div class="player-sub-card">
+      <div class="player-sub-header" onclick="toggleSubCard('former-${p.id}')">
+        <div class="jersey" style="background:var(--muted)">${p.jersey||'—'}</div>
+        <div class="player-sub-name">${p.name}<br>
+          <span style="font-size:0.7rem;color:var(--muted)">
+            ${p.group?GROUP_LABEL[p.group]+' • ':''}غادر بتاريخ ${p.formerDate||'—'}${p.formerReason?' • '+(reasonLabel[p.formerReason]||p.formerReason):''}
+          </span>
+        </div>
+        <div class="chevron" id="chevron-former-${p.id}">▼</div>
+      </div>
+      <div class="player-sub-body" id="subbody-former-${p.id}">
+        <div class="info-row"><span class="info-label">بداية الاشتراك</span><span class="info-val">${p.startDate||'—'}</span></div>
+        <div class="info-row"><span class="info-label">آخر تاريخ انتهاء</span><span class="info-val">${p.endDate||'—'}</span></div>
+        <div class="sub-actions">
+          <button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="restoreFromFormer('${p.id}')">↩️ استرجاع كلاعب حالي</button>
+          <button class="btn btn-sm" style="background:#2979ff22;color:#42a5f5;border:1px solid #2979ff33" onclick="showPlayerAttendanceHistory('${p.id}','${p.name}')">📅 سجل الحضور</button>
+          <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️ حذف نهائي</button>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+};
+
+// ===== سجل حضور مفصل للاعب (اسم اليوم + التاريخ + حاضر/غائب) =====
+window.showPlayerAttendanceHistory=function(pid,name){
+  const dates=Object.keys(state.attendance).filter(d=>state.attendance[d]&&state.attendance[d][pid]).sort().reverse();
+  if(!dates.length){
+    showModal(`📅 سجل حضور: ${name}`,'لا يوجد سجل حضور لهذا اللاعب بعد','',[{label:'إغلاق',cls:'btn-blue',action:closeModal}]);
+    return;
+  }
+  const presentCount=dates.filter(d=>state.attendance[d][pid]==='present').length;
+  const absentCount=dates.filter(d=>state.attendance[d][pid]==='absent').length;
+  const rows=dates.map(d=>{
+    const status=state.attendance[d][pid];
+    const isPresent=status==='present';
+    const color=isPresent?'var(--green)':'var(--red)';
+    const icon=isPresent?'✅':'❌';
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;background:${color}12;border:1px solid ${color}33;border-radius:8px;margin-bottom:0.32rem">
+      <span style="font-size:0.82rem;font-weight:800">${getDayName(d)}</span>
+      <span style="font-size:0.76rem;color:var(--muted)">${d}</span>
+      <span style="font-size:0.95rem">${icon}</span>
+    </div>`;
+  }).join('');
+  showModal(`📅 سجل حضور: ${name}`,'',`
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem">
+      <div style="flex:1;text-align:center;background:#00c85322;border-radius:8px;padding:0.5rem">
+        <div style="font-weight:900;color:var(--green);font-size:1.1rem">${presentCount}</div>
+        <div style="font-size:0.68rem;color:var(--muted)">✅ حاضر</div>
+      </div>
+      <div style="flex:1;text-align:center;background:#ff174422;border-radius:8px;padding:0.5rem">
+        <div style="font-weight:900;color:var(--red);font-size:1.1rem">${absentCount}</div>
+        <div style="font-size:0.68rem;color:var(--muted)">❌ غائب</div>
+      </div>
+    </div>
+    <div style="max-height:340px;overflow-y:auto">${rows}</div>
+  `,[{label:'إغلاق',cls:'btn-blue',action:closeModal}]);
 };
 
 function renderAlerts(){
@@ -1194,7 +1310,7 @@ window.renderAttList=function(){
   const sumEl=document.getElementById('attDaySummary');
   const date=document.getElementById('attDate').value;
   if(!date){el.innerHTML='<p class="empty-msg">اختر تاريخاً أولاً</p>';sumEl.innerHTML='';return;}
-  let allPlayers=getAllPlayers();
+  let allPlayers=getAllPlayers().filter(p=>!p.former);
   if(attGroup!=='all')allPlayers=allPlayers.filter(p=>(p.group||'')===attGroup);
   if(!allPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
   if(!state.attendance[date])state.attendance[date]={};
