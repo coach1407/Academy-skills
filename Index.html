@@ -230,7 +230,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="sub-tab active" onclick="switchSub('list',this)">📋 اللاعبون</button>
     <button class="sub-tab" onclick="switchSub('add',this)">➕ إضافة</button>
     <button class="sub-tab" onclick="switchSub('alerts',this)">🔔 تنبيهات</button>
-    <button class="sub-tab" onclick="switchSub('former',this)">⏮ السابقون</button>
+    <button class="sub-tab" onclick="switchSub('former',this)">🗂️ الأرشيف</button>
   </div>
   <div class="sub-page active" id="sub-list">
     <div class="search-box"><input id="subSearch" placeholder="🔍 بحث..." oninput="renderSubList()"/></div>
@@ -270,7 +270,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   <div class="sub-page" id="sub-alerts"><div id="alertsList"></div></div>
   <div class="sub-page" id="sub-former">
     <p style="color:var(--muted);font-size:0.75rem;margin-bottom:0.7rem;line-height:1.5">
-      اللاعبون اللي تم نقلهم يدوياً (انتهى اشتراكهم من فترة أو ما رغبوا بالاستمرار). بياناتهم وسجل حضورهم محفوظ، وتقدر تسترجعهم كلاعبين حاليين في أي وقت.
+      اللاعبون اللي تم نقلهم يدوياً للأرشيف (انتهى اشتراكهم من فترة أو ما رغبوا بالاستمرار). بياناتهم وسجل حضورهم محفوظ بالكامل، وما راح يظهروا بالتقييم أو تسجيل الحضور الجديد، وتقدر تسترجعهم كلاعبين حاليين في أي وقت.
     </p>
     <div class="search-box"><input id="formerSearch" placeholder="🔍 بحث..." oninput="renderFormerList()"/></div>
     <div id="formerList"></div>
@@ -626,7 +626,7 @@ window.selectDay=function(i){
 
 function renderPlayerCards(){
   const el=document.getElementById('playerCards');
-  let players=state.ratingPlayers;
+  let players=state.ratingPlayers.filter(p=>!isFormer(p.name));
   if(ratingGroup!=='all')players=players.filter(p=>(p.group||'')===ratingGroup);
   if(!players.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في هذه المجموعة</p>';return;}
   const ratings=getWeekRatings();
@@ -728,7 +728,7 @@ function renderLeaderboard(){
   // ===== الترتيب الأسبوعي =====
   const wkKey=currentWeekKey();
   const wkStart=wkKey, wkEnd=new Date(new Date(wkKey).getTime()+6*86400000).toISOString().slice(0,10);
-  const wsRaw=state.ratingPlayers.map(p=>({...p,total:getTotalScore(p.id)}));
+  const wsRaw=state.ratingPlayers.filter(p=>!isFormer(p.name)).map(p=>({...p,total:getTotalScore(p.id)}));
   const ws=rankPlayers(wsRaw,[wkKey],wkStart,wkEnd);
   const overall=renderBoard('🏆 أفضل لاعب — هذا الأسبوع',ws);
   const byGroup=['big','mid','small'].map(g=>{
@@ -752,7 +752,7 @@ function renderLeaderboard(){
   const mStart=new Date(curMonthDate.getFullYear(),curMonthDate.getMonth(),1).toISOString().slice(0,10);
   const mEnd=new Date(curMonthDate.getFullYear(),curMonthDate.getMonth()+1,0).toISOString().slice(0,10);
   const monthName=curMonthDate.toLocaleDateString('ar-EG',{month:'long',year:'numeric'});
-  const msRaw=state.ratingPlayers.map(p=>({...p,total:getMonthScore(p.id)}));
+  const msRaw=state.ratingPlayers.filter(p=>!isFormer(p.name)).map(p=>({...p,total:getMonthScore(p.id)}));
   const ms=rankPlayers(msRaw,monthKeys,mStart,mEnd);
   const monthOverall=renderBoard(`👑 أفضل لاعب — شهر ${monthName}`,ms);
   const monthByPos=['gk','def','rb','lb','mid','fwd','rw','lw'].map(pos=>{
@@ -812,9 +812,10 @@ window.addFromDropdown=function(){
 
 function renderRPlayersList(){
   const el=document.getElementById('rPlayersList');
-  if(!state.ratingPlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في قائمة التقييم</p>';return;}
+  const activePlayers=state.ratingPlayers.filter(p=>!isFormer(p.name));
+  if(!activePlayers.length){el.innerHTML='<p class="empty-msg">لا يوجد لاعبون في قائمة التقييم</p>';return;}
   const gc={big:'#2979ff',mid:'#ffd600',small:'#00c853'};
-  el.innerHTML=state.ratingPlayers.map(p=>
+  el.innerHTML=activePlayers.map(p=>
     `<div class="board-row">
       <div class="player-pos pos-${p.pos}">${POS_EMOJI[p.pos]}</div>
       <div class="board-name">${p.name}<br>
@@ -947,7 +948,7 @@ window.renderSubList=function(){
           <button class="btn btn-purple btn-sm" onclick="addCompDays('${p.id}')">➕ تعويض</button>
           <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
           <button class="btn btn-sm" style="background:#2979ff22;color:#42a5f5;border:1px solid #2979ff33" onclick="showPlayerAttendanceHistory('${p.id}','${p.name}')">📅 سجل الحضور</button>
-          <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="showTransferFormer('${p.id}')">⏮ نقل للسابقين</button>
+          <button class="btn btn-sm" style="background:#6a1b9a22;color:#ce93d8;border:1px solid #6a1b9a33" onclick="showTransferFormer('${p.id}')">🗂️ نقل للأرشيف</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️</button>
         </div>
       </div>
@@ -1163,11 +1164,11 @@ window.deleteSubPlayer=function(id){
   ]);
 };
 
-// ===== نقل لاعب لقائمة السابقين (يدوياً) =====
+// ===== نقل لاعب للأرشيف (يدوياً) =====
 window.showTransferFormer=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
   const today=new Date().toISOString().slice(0,10);
-  showModal('⏮ نقل للاعبين السابقين','',`
+  showModal('🗂️ نقل اللاعب للأرشيف','',`
     <label>سبب النقل</label>
     <select id="formerReason">
       <option value="expired">انتهى الاشتراك ولم يجدد</option>
@@ -1199,7 +1200,7 @@ window.restoreFromFormer=function(id){
   ]);
 };
 
-// ===== عرض قائمة اللاعبين السابقين =====
+// ===== عرض قائمة الأرشيف (اللاعبون السابقون) =====
 window.renderFormerList=function(){
   const el=document.getElementById('formerList');
   if(!el)return;
@@ -1288,10 +1289,17 @@ function renderAlerts(){
 }
 
 // ===== ATTENDANCE =====
+// التحقق من كون اللاعب "سابق" بمطابقة اسمه في سجل الاشتراكات (المصدر الوحيد الموثوق لهذه الحالة)
+function isFormer(name){
+  const sub=state.subPlayers.find(s=>s.name===name);
+  return !!(sub&&sub.former);
+}
+
 function getAllPlayers(){
   const all=[...state.ratingPlayers];
   state.subPlayers.forEach(p=>{if(!all.find(r=>r.name===p.name))all.push({...p});});
-  return all;
+  // نفرض حالة former الصحيحة على كل لاعب بغض النظر عن مصدره (تقييم أو اشتراكات)
+  return all.map(p=>({...p,former:isFormer(p.name)}));
 }
 
 window.setAttToday=function(){
