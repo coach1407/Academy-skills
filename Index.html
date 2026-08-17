@@ -973,18 +973,31 @@ window.addSubPlayer=function(){
     showModal('⚠️ الاسم مسجل من قبل',`يوجد لاعب مسجل بنفس الاسم "${dup.name}"${dup.jersey?' (قميص رقم '+dup.jersey+')':''}. لا يمكن تسجيل نفس الاسم مرتين.`,'',[
       {label:'✏️ فتح بيانات اللاعب الموجود',cls:'btn-blue',action:()=>{
         closeModal();
-        // الانتقال لقائمة اللاعبين وفتح كارت اللاعب الموجود مباشرة
         document.querySelectorAll('#page-subscriptions .sub-page').forEach(p=>p.classList.remove('active'));
         document.querySelectorAll('#page-subscriptions .sub-tab').forEach(t=>t.classList.remove('active'));
-        document.getElementById('sub-list').classList.add('active');
-        document.querySelector('#page-subscriptions .sub-tab').classList.add('active');
-        document.getElementById('subSearch').value=dup.name;
-        renderSubList();
-        setTimeout(()=>{
-          const body=document.getElementById('subbody-'+dup.id);
-          const chev=document.getElementById('chevron-'+dup.id);
-          if(body&&!body.classList.contains('open')){body.classList.add('open');chev.classList.add('open');}
-        },50);
+        const tabs=document.querySelectorAll('#page-subscriptions .sub-tab');
+        if(dup.former){
+          // اللاعب المكرر موجود بالأرشيف — نوديه لتبويب الأرشيف مباشرة
+          document.getElementById('sub-former').classList.add('active');
+          tabs[3].classList.add('active');
+          document.getElementById('formerSearch').value=dup.name;
+          renderFormerList();
+          setTimeout(()=>{
+            const body=document.getElementById('subbody-former-'+dup.id);
+            const chev=document.getElementById('chevron-former-'+dup.id);
+            if(body&&!body.classList.contains('open')){body.classList.add('open');chev.classList.add('open');}
+          },50);
+        } else {
+          document.getElementById('sub-list').classList.add('active');
+          tabs[0].classList.add('active');
+          document.getElementById('subSearch').value=dup.name;
+          renderSubList();
+          setTimeout(()=>{
+            const body=document.getElementById('subbody-'+dup.id);
+            const chev=document.getElementById('chevron-'+dup.id);
+            if(body&&!body.classList.contains('open')){body.classList.add('open');chev.classList.add('open');}
+          },50);
+        }
       }},
       {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
     ]);
@@ -1111,7 +1124,7 @@ window.addCompDays=function(id){
 
 window.editSubPlayer=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
-  showModal('✏️ تعديل بيانات اللاعب','',`
+  showModal(p.former?'✏️ تعديل بيانات لاعب من الأرشيف':'✏️ تعديل بيانات اللاعب','',`
     <label>الاسم</label><input id="editSName" value="${p.name}"/>
     <label>المجموعة</label>
     <select id="editSGroup">
@@ -1142,7 +1155,7 @@ window.editSubPlayer=function(id){
       p.jersey=document.getElementById('editSJersey').value;
       p.startDate=document.getElementById('editSStart').value;
       p.endDate=document.getElementById('editSEnd').value;
-      renderSubList();closeModal();
+      renderSubList();renderFormerList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
@@ -1155,10 +1168,19 @@ window.autoEditEnd=function(){
 };
 
 window.deleteSubPlayer=function(id){
-  showModal('حذف','هل تريد حذف هذا اللاعب نهائياً؟ سيتم حذف بياناته بشكل كامل ولا يمكن التراجع.','',[
+  showModal('حذف','هل تريد حذف هذا اللاعب نهائياً؟ سيتم حذف بياناته بشكل كامل (بما فيها من قائمة التقييم إن وُجد) ولا يمكن التراجع.','',[
     {label:'حذف',cls:'btn-red',action:()=>{
+      const sub=state.subPlayers.find(p=>p.id===id);
       state.subPlayers=state.subPlayers.filter(p=>p.id!==id);
-      renderSubList();renderFormerList();closeModal();
+      // حذف أي نسخة مطابقة له بالاسم من قائمة التقييم أيضاً عشان ما يرجع يظهر بالغلط
+      if(sub){
+        const rp=state.ratingPlayers.find(p=>p.name===sub.name);
+        if(rp){
+          state.ratingPlayers=state.ratingPlayers.filter(p=>p.id!==rp.id);
+          Object.values(state.weeks).forEach(w=>{if(w.ratings)delete w.ratings[rp.id];});
+        }
+      }
+      renderSubList();renderFormerList();renderPlayerCards();renderRPlayersList();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
@@ -1226,6 +1248,7 @@ window.renderFormerList=function(){
         <div class="info-row"><span class="info-label">آخر تاريخ انتهاء</span><span class="info-val">${p.endDate||'—'}</span></div>
         <div class="sub-actions">
           <button class="btn btn-sm" style="background:#00c85322;color:var(--green);border:1px solid #00c85344" onclick="restoreFromFormer('${p.id}')">↩️ استرجاع كلاعب حالي</button>
+          <button class="btn btn-blue btn-sm" onclick="editSubPlayer('${p.id}')">✏️ تعديل</button>
           <button class="btn btn-sm" style="background:#2979ff22;color:#42a5f5;border:1px solid #2979ff33" onclick="showPlayerAttendanceHistory('${p.id}','${p.name}')">📅 سجل الحضور</button>
           <button class="btn btn-red btn-sm" onclick="deleteSubPlayer('${p.id}')">🗑️ حذف نهائي</button>
         </div>
@@ -1273,12 +1296,12 @@ function renderAlerts(){
   const el=document.getElementById('alertsList');
   const now=new Date();
   const expiring=state.subPlayers.filter(p=>{
-    if(p.stopped||!p.endDate)return false;
+    if(p.former||p.stopped||!p.endDate)return false;
     const diff=(new Date(p.endDate)-now)/(1000*60*60*24);
     return diff>=0&&diff<=10;
   });
   const expired=state.subPlayers.filter(p=>{
-    if(p.stopped||!p.endDate)return false;
+    if(p.former||p.stopped||!p.endDate)return false;
     return new Date(p.endDate)<now;
   });
   let html='';
