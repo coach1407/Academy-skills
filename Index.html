@@ -1052,17 +1052,29 @@ window.addSubPlayer=function(){
 
 window.renewSub=function(id){
   const p=state.subPlayers.find(x=>x.id===id);if(!p)return;
+  const today=new Date().toISOString().slice(0,10);
   showModal('🔄 تجديد الاشتراك','',`
-    <label>تاريخ الانتهاء الجديد</label>
-    <input type="date" id="renewDate" value="${p.endDate||''}"/>
+    <label>تاريخ بداية الاشتراك الجديد</label>
+    <input type="date" id="renewStart" value="${today}" oninput="autoRenewEnd()"/>
+    <label>تاريخ الانتهاء الجديد (تلقائي — قابل للتعديل)</label>
+    <input type="date" id="renewEnd" value="${p.endDate||''}"/>
   `,[
     {label:'تجديد',cls:'btn-green',action:()=>{
-      const v=document.getElementById('renewDate').value;
-      if(v){p.endDate=v;p.stopped=false;}
-      renderSubList();closeModal();
+      const start=document.getElementById('renewStart').value;
+      const end=document.getElementById('renewEnd').value;
+      if(start)p.startDate=start;
+      if(end)p.endDate=end;
+      p.stopped=false;
+      renderSubList();renderFormerList();renderFinance();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
   ]);
+};
+window.autoRenewEnd=function(){
+  const s=document.getElementById('renewStart').value;
+  if(!s)return;
+  const d=new Date(s);d.setMonth(d.getMonth()+1);
+  document.getElementById('renewEnd').value=d.toISOString().slice(0,10);
 };
 
 window.showStopSub=function(id){
@@ -1300,10 +1312,31 @@ window.renderFormerList=function(){
 };
 
 // ===== سجل حضور مفصل للاعب (اسم اليوم + التاريخ + حاضر/غائب) =====
-window.showPlayerAttendanceHistory=function(pid,name){
-  const dates=Object.keys(state.attendance).filter(d=>state.attendance[d]&&state.attendance[d][pid]).sort().reverse();
+window.showPlayerAttendanceHistory=function(pid,name,mode){
+  mode=mode||'all';
+  const sub=state.subPlayers.find(s=>s.id===pid);
+  const allDates=Object.keys(state.attendance).filter(d=>state.attendance[d]&&state.attendance[d][pid]).sort();
+  let dates=allDates;
+  let emptyNote='لا يوجد سجل حضور لهذا اللاعب بعد';
+  if(mode==='current'){
+    const presentDatesAsc=allDates.filter(d=>state.attendance[d][pid]==='present');
+    const lastPresent=presentDatesAsc.length?presentDatesAsc[presentDatesAsc.length-1]:null;
+    if(sub&&sub.startDate&&lastPresent){
+      dates=allDates.filter(d=>d>=sub.startDate&&d<=lastPresent);
+    } else {
+      dates=[];
+    }
+    emptyNote='لا يوجد سجل حضور ضمن فترة الاشتراك الحالي';
+  }
+  dates=[...dates].sort().reverse();
+  // زر التبديل بين عرض كل السجل وعرض فترة الاشتراك الحالي فقط (يظهر فقط لو اللاعب مسجل بالاشتراكات)
+  const toggleHTML=sub?`
+    <div style="display:flex;gap:0.4rem;margin-bottom:0.8rem">
+      <button class="btn btn-sm" style="flex:1;background:${mode==='all'?'var(--green)':'var(--card2)'};color:${mode==='all'?'#000':'var(--text)'};border:1px solid var(--border)" onclick="showPlayerAttendanceHistory('${pid}','${name}','all')">📋 كل السجل</button>
+      <button class="btn btn-sm" style="flex:1;background:${mode==='current'?'var(--green)':'var(--card2)'};color:${mode==='current'?'#000':'var(--text)'};border:1px solid var(--border)" onclick="showPlayerAttendanceHistory('${pid}','${name}','current')">📅 الاشتراك الحالي فقط</button>
+    </div>`:'';
   if(!dates.length){
-    showModal(`📅 سجل حضور: ${name}`,'لا يوجد سجل حضور لهذا اللاعب بعد','',[{label:'إغلاق',cls:'btn-blue',action:closeModal}]);
+    showModal(`📅 سجل حضور: ${name}`,'',`${toggleHTML}<p class="empty-msg">${emptyNote}</p>`,[{label:'إغلاق',cls:'btn-blue',action:closeModal}]);
     return;
   }
   const presentCount=dates.filter(d=>state.attendance[d][pid]==='present').length;
@@ -1320,6 +1353,7 @@ window.showPlayerAttendanceHistory=function(pid,name){
     </div>`;
   }).join('');
   showModal(`📅 سجل حضور: ${name}`,'',`
+    ${toggleHTML}
     <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem">
       <div style="flex:1;text-align:center;background:#00c85322;border-radius:8px;padding:0.5rem">
         <div style="font-weight:900;color:var(--green);font-size:1.1rem">${presentCount}</div>
