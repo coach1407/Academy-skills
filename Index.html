@@ -353,7 +353,10 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     <button class="sub-tab" onclick="switchFinance('summary',this)">📊 الملخص</button>
   </div>
   <div class="sub-page active" id="fin-income">
-    <div class="filter-row" style="padding:0.9rem 0.9rem 0">
+    <div style="padding:0.9rem 0.9rem 0">
+      <select id="finIncomePeriod" onchange="renderFinance()"></select>
+    </div>
+    <div class="filter-row" style="padding:0.7rem 0.9rem 0">
       <button class="day-pill active" onclick="setFinanceGroup('all',this)">الكل</button>
       <button class="day-pill" onclick="setFinanceGroup('big',this)">🔵 الكبار</button>
       <button class="day-pill" onclick="setFinanceGroup('mid',this)">🟡 الوسط</button>
@@ -361,9 +364,9 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
     </div>
     <div style="padding:0 0.9rem">
       <div class="section" style="text-align:center">
-        <div class="section-title" id="financeGroupLabel">💰 إجمالي الاشتراكات — الكل</div>
+        <div class="section-title" id="financeGroupLabel">💰 إجمالي الإيرادات — الكل</div>
         <div style="font-size:2.2rem;font-weight:900;color:var(--gold)" id="financeTotal">0</div>
-        <div style="font-size:0.75rem;color:var(--muted);margin-top:0.2rem" id="financeCount">0 لاعب</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:0.2rem" id="financeCount">0 عملية دفع</div>
       </div>
       <div class="search-box"><input id="financeSearch" placeholder="🔍 بحث..." oninput="renderFinance()"/></div>
       <div id="financeList"></div>
@@ -371,6 +374,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   </div>
   <div class="sub-page" id="fin-expenses">
     <div style="padding:0.9rem">
+      <select id="finExpensePeriod" onchange="renderExpenses()" style="margin-bottom:0.7rem"></select>
       <div class="section">
         <div class="section-title">➕ إضافة مصروف جديد</div>
         <div class="form-grid">
@@ -406,6 +410,7 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
   </div>
   <div class="sub-page" id="fin-summary">
     <div style="padding:0.9rem">
+      <select id="finSummaryPeriod" onchange="renderFinanceSummary()" style="margin-bottom:0.9rem"></select>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-num" id="sumIncome">0</div><div style="font-size:0.7rem;color:var(--muted)">📥 إيرادات</div></div>
         <div class="stat-card"><div class="stat-num" style="color:var(--red)" id="sumExpense">0</div><div style="font-size:0.7rem;color:var(--muted)">📤 مصروفات</div></div>
@@ -477,9 +482,53 @@ const SUB_LABEL={active:'✅ فعال',expired:'❌ منتهي',stopped:'⏸ م�
 const SUB_CLASS={active:'sub-active',expired:'sub-expired',stopped:'sub-stopped',expiring:'sub-expiring'};
 const PLAN_LABEL={'3days':'📅 3 أيام أسبوعياً','2days':'📅 يومين أسبوعياً',other:'✏️ خطة أخرى'};
 const EXPENSE_LABEL={field:'🏟️ حجز ملعب',equipment:'⚽ أدوات تدريب / كور',water:'💧 ماء ومشروبات',gifts:'🎁 هدايا للاعبين',other:'📦 أخرى'};
+const MONTH_NAMES_AR=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+// بناء قائمة خيارات الفترة (شهر مُحدد / سنة كاملة / إجمالي كل الأوقات) من مجموعة تواريخ
+function buildPeriodOptions(dates){
+  const monthsByYear={};
+  dates.forEach(d=>{
+    if(!d)return;
+    const year=d.slice(0,4), month=d.slice(0,7);
+    if(!monthsByYear[year])monthsByYear[year]=new Set();
+    monthsByYear[year].add(month);
+  });
+  const years=Object.keys(monthsByYear).sort().reverse();
+  let html='<option value="">📊 الإجمالي الكامل (كل الأوقات)</option>';
+  years.forEach(y=>{
+    html+=`<option value="year:${y}">📅 كل سنة ${y}</option>`;
+    const months=[...monthsByYear[y]].sort().reverse();
+    months.forEach(m=>{
+      const monthNum=parseInt(m.slice(5,7),10)-1;
+      html+=`<option value="${m}">　 ${MONTH_NAMES_AR[monthNum]||m} ${y}</option>`;
+    });
+  });
+  return html;
+}
+// تحديث خيارات قائمة فترة معينة مع الحفاظ على الاختيار الحالي إن أمكن
+function refreshPeriodSelect(selectId,dates){
+  const sel=document.getElementById(selectId);
+  if(!sel)return;
+  const prevVal=sel.value;
+  sel.innerHTML=buildPeriodOptions(dates);
+  if([...sel.options].some(o=>o.value===prevVal))sel.value=prevVal;
+}
+// التحقق هل تاريخ معين يقع ضمن الفترة المختارة
+function matchesPeriod(dateStr,period){
+  if(!period)return true;
+  if(period.startsWith('year:'))return(dateStr||'').startsWith(period.slice(5)+'-');
+  return(dateStr||'').startsWith(period);
+}
+// وصف نصي مختصر للفترة المختارة (لعرضه بعنوان الإجمالي)
+function periodLabel(period){
+  if(!period)return'كل الأوقات';
+  if(period.startsWith('year:'))return'سنة '+period.slice(5);
+  const y=period.slice(0,4),m=parseInt(period.slice(5,7),10)-1;
+  return(MONTH_NAMES_AR[m]||period)+' '+y;
+}
 
 // ===== STATE =====
-let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},visitors:[],expenses:[],currentDay:0};
+let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},visitors:[],expenses:[],payments:[],paymentsMigrated:false,currentDay:0};
 let weekOffset=0, openCard=null, subFilter='all', subGroupFilter='all', ratingGroup='all', attGroup='all', financeGroup='all', expenseFilter='all';
 
 // ===== HELPERS =====
@@ -494,6 +543,27 @@ function setSyncStatus(t,m){
 }
 
 // ===== FIREBASE =====
+// ترحيل لمرة واحدة: تحويل قيمة الاشتراك الحالية لكل لاعب مسجل مسبقاً إلى أول سجل دفع في السجل المالي
+// (حتى لا نفقد الإيرادات القديمة عند تفعيل نظام سجل المدفوعات لأول مرة)
+function migratePaymentsIfNeeded(){
+  if(state.paymentsMigrated)return;
+  if(!state.payments)state.payments=[];
+  state.subPlayers.forEach(p=>{
+    if((parseFloat(p.price)||0)>0){
+      state.payments.push({
+        id:'mig-'+p.id,
+        playerId:p.id,
+        playerName:p.name,
+        group:p.group||'',
+        amount:parseFloat(p.price)||0,
+        date:p.startDate||new Date().toISOString().slice(0,10),
+        type:'registration'
+      });
+    }
+  });
+  state.paymentsMigrated=true;
+}
+
 async function loadAll(){
   setSyncStatus('loading','جاري التحميل... <span class="spinner"></span>');
   try{
@@ -506,6 +576,8 @@ async function loadAll(){
       if(d.attendance)state.attendance=d.attendance;
       if(d.visitors)state.visitors=d.visitors;
       if(d.expenses)state.expenses=d.expenses;
+      if(d.payments)state.payments=d.payments;
+      if(d.paymentsMigrated)state.paymentsMigrated=d.paymentsMigrated;
       setSyncStatus('ok','✅ متصل بالسحابة');
     } else {
       setSyncStatus('ok','✅ جاهز');
@@ -513,6 +585,7 @@ async function loadAll(){
   } catch(e){
     setSyncStatus('err','⚠️ خطأ في الاتصال');
   }
+  migratePaymentsIfNeeded();
   renderAll();
   populateMonthFilter();
 }
@@ -547,19 +620,27 @@ window.switchMain=function(id,btn){
   btn.classList.add('active');
   if(id==='subscriptions'){renderSubList();renderAlerts();}
   if(id==='attendance'){renderAttList();}
-  if(id==='finance'){renderFinance();}
+  if(id==='finance'){refreshPeriodSelect('finIncomePeriod',(state.payments||[]).map(p=>p.date));renderFinance();}
 };
 window.switchFinance=function(id,btn){
   document.querySelectorAll('#page-finance .sub-page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('#page-finance .sub-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('fin-'+id).classList.add('active');
   btn.classList.add('active');
-  if(id==='income')renderFinance();
+  if(id==='income'){
+    refreshPeriodSelect('finIncomePeriod',(state.payments||[]).map(p=>p.date));
+    renderFinance();
+  }
   if(id==='expenses'){
     if(!document.getElementById('expDate').value)document.getElementById('expDate').value=new Date().toISOString().slice(0,10);
+    refreshPeriodSelect('finExpensePeriod',(state.expenses||[]).map(e=>e.date));
     renderExpenses();
   }
-  if(id==='summary')renderFinanceSummary();
+  if(id==='summary'){
+    const allDates=[...(state.payments||[]).map(p=>p.date),...(state.expenses||[]).map(e=>e.date)];
+    refreshPeriodSelect('finSummaryPeriod',allDates);
+    renderFinanceSummary();
+  }
 };
 window.switchSub=function(id,btn){
   document.querySelectorAll('#page-subscriptions .sub-page').forEach(p=>p.classList.remove('active'));
@@ -1114,6 +1195,14 @@ window.addSubPlayer=function(){
     stopped:false
   };
   state.subPlayers.push(p);
+  if(p.price>0){
+    state.payments.push({
+      id:Date.now().toString()+'-reg',
+      playerId:p.id,playerName:p.name,group:p.group||'',
+      amount:p.price,date:p.startDate||new Date().toISOString().slice(0,10),
+      type:'registration'
+    });
+  }
   ['sName','sBirth','sJersey','sStart','sEnd','sPrice'].forEach(id=>document.getElementById(id).value='');
   showModal('✅ تم','تم تسجيل اللاعب بنجاح','',[{label:'حسناً',cls:'btn-green',action:closeModal}]);
   renderSubList();
@@ -1127,13 +1216,24 @@ window.renewSub=function(id){
     <input type="date" id="renewStart" value="${today}" oninput="autoRenewEnd()"/>
     <label>تاريخ الانتهاء الجديد (تلقائي — قابل للتعديل)</label>
     <input type="date" id="renewEnd" value="${p.endDate||''}"/>
+    <label>مبلغ هذا التجديد</label>
+    <input type="number" step="0.01" id="renewAmount" value="${p.price||0}"/>
   `,[
     {label:'تجديد',cls:'btn-green',action:()=>{
       const start=document.getElementById('renewStart').value;
       const end=document.getElementById('renewEnd').value;
+      const amount=parseFloat(document.getElementById('renewAmount').value)||0;
       if(start)p.startDate=start;
       if(end)p.endDate=end;
       p.stopped=false;
+      if(amount>0){
+        p.price=amount;
+        state.payments.push({
+          id:Date.now().toString()+'-renew',
+          playerId:p.id,playerName:p.name,group:p.group||'',
+          amount,date:start||today,type:'renewal'
+        });
+      }
       renderSubList();renderFormerList();renderFinance();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
@@ -1674,24 +1774,25 @@ window.renderFinance=function(){
   const listEl=document.getElementById('financeList');
   if(!totalEl)return;
   const search=(document.getElementById('financeSearch').value||'').toLowerCase();
-  // نحسب الإجمالي فقط من اللاعبين الحاليين (غير المؤرشفين) — الأرشيف لا يدخل بحساب الميزانية الحالية
-  let players=state.subPlayers.filter(p=>!p.former);
-  if(financeGroup!=='all')players=players.filter(p=>(p.group||'')===financeGroup);
-  const total=players.reduce((s,p)=>s+(parseFloat(p.price)||0),0);
-  labelEl.textContent=`💰 إجمالي الاشتراكات — ${financeGroup==='all'?'الكل':GROUP_LABEL[financeGroup]}`;
+  const period=document.getElementById('finIncomePeriod').value;
+  let payments=[...(state.payments||[])].filter(p=>matchesPeriod(p.date,period));
+  if(financeGroup!=='all')payments=payments.filter(p=>(p.group||'')===financeGroup);
+  const total=payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  labelEl.textContent=`💰 إجمالي الإيرادات — ${financeGroup==='all'?'الكل':GROUP_LABEL[financeGroup]} — ${periodLabel(period)}`;
   totalEl.textContent=total.toLocaleString('en-US',{maximumFractionDigits:2});
-  countEl.textContent=`${players.length} لاعب`;
-  let listPlayers=players;
-  if(search)listPlayers=listPlayers.filter(p=>p.name.toLowerCase().includes(search));
-  listPlayers=[...listPlayers].sort((a,b)=>(parseFloat(b.price)||0)-(parseFloat(a.price)||0));
-  if(!listPlayers.length){listEl.innerHTML='<p class="empty-msg">لا يوجد لاعبون</p>';return;}
-  listEl.innerHTML=listPlayers.map(p=>`
+  countEl.textContent=`${payments.length} عملية دفع`;
+  let listPayments=payments;
+  if(search)listPayments=listPayments.filter(p=>(p.playerName||'').toLowerCase().includes(search));
+  listPayments=[...listPayments].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!listPayments.length){listEl.innerHTML='<p class="empty-msg">لا توجد عمليات دفع ضمن هذه الفترة</p>';return;}
+  const TYPE_LABEL={registration:'تسجيل جديد',renewal:'تجديد'};
+  listEl.innerHTML=listPayments.map(p=>`
     <div class="board-row">
       <div style="flex:1">
-        <div style="font-weight:700;font-size:0.85rem">${p.name}</div>
-        <div style="font-size:0.7rem;color:var(--muted)">${p.group?GROUP_LABEL[p.group]+' • ':''}${PLAN_LABEL[p.plan]||'—'}</div>
+        <div style="font-weight:700;font-size:0.85rem">${p.playerName}</div>
+        <div style="font-size:0.7rem;color:var(--muted)">${p.group?GROUP_LABEL[p.group]+' • ':''}${TYPE_LABEL[p.type]||''} • ${p.date}</div>
       </div>
-      <div class="board-pts">${(parseFloat(p.price)||0).toLocaleString('en-US',{maximumFractionDigits:2})}</div>
+      <div class="board-pts">${(parseFloat(p.amount)||0).toLocaleString('en-US',{maximumFractionDigits:2})}</div>
     </div>`
   ).join('');
 };
@@ -1706,6 +1807,7 @@ window.addExpense=function(){
   state.expenses.push({id:Date.now().toString(),category,note,amount,date});
   document.getElementById('expAmount').value='';
   document.getElementById('expNote').value='';
+  refreshPeriodSelect('finExpensePeriod',state.expenses.map(e=>e.date));
   renderExpenses();
 };
 
@@ -1713,6 +1815,7 @@ window.deleteExpense=function(id){
   showModal('حذف مصروف','هل تريد حذف هذا المصروف؟','',[
     {label:'حذف',cls:'btn-red',action:()=>{
       state.expenses=state.expenses.filter(e=>e.id!==id);
+      refreshPeriodSelect('finExpensePeriod',state.expenses.map(e=>e.date));
       renderExpenses();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
@@ -1730,12 +1833,13 @@ window.renderExpenses=function(){
   const totalEl=document.getElementById('expenseTotal');
   const listEl=document.getElementById('expensesList');
   if(!totalEl)return;
-  let expenses=[...(state.expenses||[])];
+  const period=document.getElementById('finExpensePeriod').value;
+  let expenses=[...(state.expenses||[])].filter(e=>matchesPeriod(e.date,period));
   if(expenseFilter!=='all')expenses=expenses.filter(e=>e.category===expenseFilter);
   const total=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   totalEl.textContent=total.toLocaleString('en-US',{maximumFractionDigits:2});
   expenses.sort((a,b)=>b.date.localeCompare(a.date));
-  if(!expenses.length){listEl.innerHTML='<p class="empty-msg">لا توجد مصروفات مسجلة</p>';return;}
+  if(!expenses.length){listEl.innerHTML='<p class="empty-msg">لا توجد مصروفات ضمن هذه الفترة</p>';return;}
   listEl.innerHTML=expenses.map(e=>`
     <div class="board-row">
       <div style="flex:1">
@@ -1755,17 +1859,20 @@ window.renderFinanceSummary=function(){
   const netEl=document.getElementById('sumNet');
   const breakdownEl=document.getElementById('expenseBreakdown');
   if(!incomeEl)return;
-  const income=state.subPlayers.filter(p=>!p.former).reduce((s,p)=>s+(parseFloat(p.price)||0),0);
-  const expenseTotal=(state.expenses||[]).reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  const period=document.getElementById('finSummaryPeriod').value;
+  const payments=(state.payments||[]).filter(p=>matchesPeriod(p.date,period));
+  const expenses=(state.expenses||[]).filter(e=>matchesPeriod(e.date,period));
+  const income=payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const expenseTotal=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   const net=income-expenseTotal;
   incomeEl.textContent=income.toLocaleString('en-US',{maximumFractionDigits:2});
   expenseEl.textContent=expenseTotal.toLocaleString('en-US',{maximumFractionDigits:2});
   netEl.textContent=net.toLocaleString('en-US',{maximumFractionDigits:2});
   netEl.style.color=net>=0?'var(--green)':'var(--red)';
   const byCategory={};
-  (state.expenses||[]).forEach(e=>{byCategory[e.category]=(byCategory[e.category]||0)+(parseFloat(e.amount)||0);});
+  expenses.forEach(e=>{byCategory[e.category]=(byCategory[e.category]||0)+(parseFloat(e.amount)||0);});
   const cats=Object.keys(byCategory).sort((a,b)=>byCategory[b]-byCategory[a]);
-  if(!cats.length){breakdownEl.innerHTML='<p class="empty-msg">لا توجد مصروفات بعد</p>';return;}
+  if(!cats.length){breakdownEl.innerHTML='<p class="empty-msg">لا توجد مصروفات ضمن هذه الفترة</p>';return;}
   breakdownEl.innerHTML=cats.map(c=>{
     const pct=expenseTotal?Math.round(byCategory[c]/expenseTotal*100):0;
     return`<div style="margin-bottom:0.6rem">
