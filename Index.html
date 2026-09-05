@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -150,7 +149,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 <body>
 
 <!-- ===== شاشة تسجيل الدخول ===== -->
-
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <h1>⚽ أكاديمية سكيلز</h1>
@@ -180,7 +178,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 </div>
 
 <!-- ===== RATING ===== -->
-
 <div class="page active" id="page-rating">
   <div class="week-bar">
     <button class="wk-btn" onclick="changeWeek(-1)">‹</button>
@@ -249,7 +246,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 </div>
 
 <!-- ===== SUBSCRIPTIONS ===== -->
-
 <div class="page" id="page-subscriptions">
   <div class="sub-tabs">
     <button class="sub-tab active" onclick="switchSub('list',this)">📋 اللاعبون</button>
@@ -310,7 +306,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 </div>
 
 <!-- ===== ATTENDANCE ===== -->
-
 <div class="page" id="page-attendance">
   <div class="sub-tabs">
     <button class="sub-tab active" onclick="switchAtt('record',this)">📝 تسجيل</button>
@@ -369,7 +364,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 </div>
 
 <!-- ===== FINANCE ===== -->
-
 <div class="page" id="page-finance">
   <div class="sub-tabs">
     <button class="sub-tab active" onclick="switchFinance('income',this)">📥 الإيرادات</button>
@@ -451,7 +445,6 @@ label{font-size:0.76rem;color:var(--muted);margin-bottom:0.18rem;display:block;}
 <!-- نهاية appRoot -->
 
 <!-- MODAL -->
-
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3 id="modalTitle"></h3>
@@ -1262,6 +1255,10 @@ window.renewSub=function(id){
       if(start)p.startDate=start;
       if(end)p.endDate=end;
       p.stopped=false;
+      // اشتراك جديد كامل — نصفّر أي أثر لإيقاف أو تعويض من الدورة السابقة
+      p.stopDate='';
+      p.resumeDate='';
+      p.compDaysTotal=0;
       if(amount>0){
         p.price=amount;
         state.payments.push({
@@ -1395,6 +1392,12 @@ window.editSubPlayer=function(id){
     <input id="editSEnd" type="date" value="${p.endDate||''}"/>
     <label>قيمة الاشتراك</label>
     <input id="editSPrice" type="number" step="0.01" value="${p.price||0}"/>
+    ${p.stopDate||p.stopped?`<label>تاريخ الإيقاف <span style="color:var(--muted)">(اتركه فارغاً لحذفه)</span></label>
+    <input id="editSStopDate" type="date" value="${p.stopDate||''}"/>`:''}
+    ${p.resumeDate?`<label>تاريخ الاستكمال <span style="color:var(--muted)">(اتركه فارغاً لحذفه)</span></label>
+    <input id="editSResumeDate" type="date" value="${p.resumeDate||''}"/>`:''}
+    ${(p.compDaysTotal&&p.compDaysTotal>0)?`<label>إجمالي أيام التعويض <span style="color:var(--muted)">(اكتب 0 لحذفها)</span></label>
+    <input id="editSCompDays" type="number" min="0" value="${p.compDaysTotal||0}"/>`:''}
   `,[
     {label:'حفظ',cls:'btn-green',action:()=>{
       const newName=document.getElementById('editSName').value.trim()||p.name;
@@ -1414,6 +1417,15 @@ window.editSubPlayer=function(id){
       p.startDate=document.getElementById('editSStart').value;
       p.endDate=document.getElementById('editSEnd').value;
       p.price=parseFloat(document.getElementById('editSPrice').value)||0;
+      const stopEl=document.getElementById('editSStopDate');
+      if(stopEl){
+        p.stopDate=stopEl.value||'';
+        if(!p.stopDate)p.stopped=false;
+      }
+      const resumeEl=document.getElementById('editSResumeDate');
+      if(resumeEl)p.resumeDate=resumeEl.value||'';
+      const compEl=document.getElementById('editSCompDays');
+      if(compEl)p.compDaysTotal=parseInt(compEl.value)||0;
       renderSubList();renderFormerList();renderFinance();closeModal();
     }},
     {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
@@ -1973,6 +1985,5 @@ onAuthStateChanged(auth,(user)=>{
   }
 });
 </script>
-
 </body>
 </html>
