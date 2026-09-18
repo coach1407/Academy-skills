@@ -1460,7 +1460,26 @@ window.editSubPlayer=function(id){
       p.plan=document.getElementById('editSPlan').value;
       p.startDate=document.getElementById('editSStart').value;
       p.endDate=document.getElementById('editSEnd').value;
-      p.price=parseFloat(document.getElementById('editSPrice').value)||0;
+      const oldPrice=parseFloat(p.price)||0;
+      const newPrice=parseFloat(document.getElementById('editSPrice').value)||0;
+      p.price=newPrice;
+      // لو القيمة اتغيّرت، نحدّث آخر سجل دفعة مرتبط بنفس اللاعب في السجل المالي (payments)
+      // عشان الميزانية توافق القيمة الصحيحة المكتوبة بالاشتراكات، بدل ما يفضل السجل القديم بالغلط
+      if(newPrice!==oldPrice){
+        const playerPayments=state.payments.filter(pay=>pay.playerId===p.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+        const lastPayment=playerPayments[playerPayments.length-1];
+        if(lastPayment){
+          lastPayment.amount=newPrice;
+        } else if(newPrice>0){
+          // اللاعب معندوش أي سجل دفعة سابق (نادر) — ننشئ سجل جديد بدل ما نفقد القيمة
+          state.payments.push({
+            id:Date.now().toString()+'-fix',
+            playerId:p.id,playerName:p.name,group:p.group||'',
+            amount:newPrice,date:p.startDate||new Date().toISOString().slice(0,10),
+            type:'registration'
+          });
+        }
+      }
       const stopEl=document.getElementById('editSStopDate');
       if(stopEl){
         p.stopDate=stopEl.value||'';
