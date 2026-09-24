@@ -608,6 +608,7 @@ function periodLabel(period){
 // ===== STATE =====
 let state={ratingPlayers:[],weeks:{},subPlayers:[],attendance:{},visitors:[],expenses:[],payments:[],paymentsMigrated:false,currentDay:0};
 let weekOffset=0, openCard=null, subFilter='all', subGroupFilter='all', ratingGroup='all', attGroup='all', financeGroup='all', expenseFilter='all';
+let lastDeletedPayment=null; // نسخة احتياطية مؤقتة لآخر سجل دفعة محذوف (لمدة الجلسة الحالية فقط) للتراجع الفوري عن حذف بالخطأ
 
 // ===== HELPERS =====
 function getDayName(dateStr){
@@ -1987,8 +1988,40 @@ window.renderFinance=function(){
         <div style="font-size:0.7rem;color:var(--muted)">${p.group?GROUP_LABEL[p.group]+' • ':''}${TYPE_LABEL[p.type]||''} • ${p.date}</div>
       </div>
       <div class="board-pts">${(parseFloat(p.amount)||0).toLocaleString('en-US',{maximumFractionDigits:2})}</div>
+      <button class="btn btn-red btn-sm" onclick="deletePayment('${p.id}')">🗑️</button>
     </div>`
   ).join('');
+};
+
+window.deletePayment=function(id){
+  const pay=state.payments.find(p=>p.id===id);if(!pay)return;
+  showModal('🗑️ حذف سجل دفعة',`هل تريد حذف سجل دفعة "${pay.playerName}" بمبلغ ${(parseFloat(pay.amount)||0).toLocaleString('en-US',{maximumFractionDigits:2})} بتاريخ ${pay.date}؟`,'',[
+    {label:'حذف',cls:'btn-red',action:()=>{
+      state.payments=state.payments.filter(p=>p.id!==id);
+      lastDeletedPayment=pay;
+      renderFinance();closeModal();
+      showUndoDeleteToast();
+    }},
+    {label:'إلغاء',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
+};
+
+// تنبيه سريع بعد الحذف يتيح التراجع الفوري (خلال نفس الجلسة، قبل الحفظ للسحابة)
+// حماية بسيطة ضد حذف سطر صحيح بالخطأ بدل السطر المكرر
+window.showUndoDeleteToast=function(){
+  if(!lastDeletedPayment)return;
+  const pay=lastDeletedPayment;
+  showModal('✅ تم الحذف',`تم حذف سجل دفعة "${pay.playerName}" بمبلغ ${(parseFloat(pay.amount)||0).toLocaleString('en-US',{maximumFractionDigits:2})}. لو حذفته بالغلط، تقدر تسترجعه الآن.`,'',[
+    {label:'↩️ تراجع عن الحذف',cls:'btn-green',action:()=>{
+      if(lastDeletedPayment){
+        state.payments.push(lastDeletedPayment);
+        lastDeletedPayment=null;
+        renderFinance();
+      }
+      closeModal();
+    }},
+    {label:'تم',cls:'btn btn-blue btn-sm',action:closeModal}
+  ]);
 };
 
 // ===== المصروفات =====
@@ -2087,13 +2120,24 @@ window.showModal=function(title,msg,bodyHTML,btns){
   const msgEl=document.getElementById('modalMsg');
   if(msg){msgEl.style.display='block';msgEl.textContent=msg;}else{msgEl.style.display='none';}
   document.getElementById('modalBody').innerHTML=bodyHTML||'';
-  document.getElementById('modalBtns').innerHTML=btns.map((b,i)=>
+  const btnsEl=document.getElementById('modalBtns');
+  btnsEl.dataset.locked='0';
+  btnsEl.innerHTML=btns.map((b,i)=>
     `<button class="btn ${b.cls}" onclick="modalAction(${i})">${b.label}</button>`
   ).join('');
   document.getElementById('modalOverlay').classList.add('open');
   window._modalActions=btns.map(b=>b.action);
 };
-window.modalAction=function(i){window._modalActions[i]();};
+window.modalAction=function(i){
+  // حماية من الضغط المزدوج: نعطّل كل أزرار النافذة فوراً عند أول ضغطة عشان ما تتكرر أي عملية (زي تجديد الاشتراك) بالغلط
+  const btnsEl=document.getElementById('modalBtns');
+  if(btnsEl){
+    if(btnsEl.dataset.locked==='1')return;
+    btnsEl.dataset.locked='1';
+    btnsEl.querySelectorAll('button').forEach(b=>b.disabled=true);
+  }
+  window._modalActions[i]();
+};
 window.closeModal=function(){document.getElementById('modalOverlay').classList.remove('open');};
 
 // ===== تسجيل الدخول =====
