@@ -1540,24 +1540,27 @@ window.editSubPlayer=function(id){
       p.birthYear=document.getElementById('editSBirth').value;
       p.jersey=document.getElementById('editSJersey').value;
       p.plan=document.getElementById('editSPlan').value;
-      p.startDate=document.getElementById('editSStart').value;
       p.endDate=document.getElementById('editSEnd').value;
       const oldPrice=parseFloat(p.price)||0;
+      const oldStartDate=p.startDate;
+      const newStartDate=document.getElementById('editSStart').value;
+      p.startDate=newStartDate;
       const newPrice=parseFloat(document.getElementById('editSPrice').value)||0;
       p.price=newPrice;
-      // لو القيمة اتغيّرت، نحدّث آخر سجل دفعة مرتبط بنفس اللاعب في السجل المالي (payments)
-      // عشان الميزانية توافق القيمة الصحيحة المكتوبة بالاشتراكات، بدل ما يفضل السجل القديم بالغلط
-      if(newPrice!==oldPrice){
+      // لو القيمة و/أو تاريخ بداية الاشتراك اتغيّروا، نحدّث آخر سجل دفعة مرتبط بنفس اللاعب في السجل المالي (payments)
+      // عشان الميزانية توافق القيمة والتاريخ الصحيحين المكتوبين بالاشتراكات، بدل ما يفضل السجل القديم بالغلط
+      if(newPrice!==oldPrice||newStartDate!==oldStartDate){
         const playerPayments=state.payments.filter(pay=>pay.playerId===p.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
         const lastPayment=playerPayments[playerPayments.length-1];
         if(lastPayment){
           lastPayment.amount=newPrice;
+          if(newStartDate)lastPayment.date=newStartDate;
         } else if(newPrice>0){
           // اللاعب معندوش أي سجل دفعة سابق (نادر) — ننشئ سجل جديد بدل ما نفقد القيمة
           state.payments.push({
             id:Date.now().toString()+'-fix',
             playerId:p.id,playerName:p.name,group:p.group||'',
-            amount:newPrice,date:p.startDate||new Date().toISOString().slice(0,10),
+            amount:newPrice,date:newStartDate||new Date().toISOString().slice(0,10),
             type:'registration'
           });
         }
